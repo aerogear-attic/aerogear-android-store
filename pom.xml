@@ -56,16 +56,18 @@
 
     <properties>
 
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Project depencies versions -->
         <aerogear.bom.version>0.2.0</aerogear.bom.version>
-
-        <!-- Project depencies verions -->
         <android.version>4.1.1.4</android.version>
-        <aerogear.android.version>2.0.0-SNAPSHOT</aerogear.android.version>
+        <aerogear.android.core.version>2.0.0-SNAPSHOT</aerogear.android.core.version>
+        <aerogear.android.security.version>2.0.0-SNAPSHOT</aerogear.android.security.version>
+
+        <!-- Test dependencies -->
+        <junit.version>4.8.2</junit.version>
+        <roboeletric.version>2.2</roboeletric.version>
 
         <!-- Plugins versions -->
         <java.version>1.7</java.version>
-        <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
         <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
         <maven.android.plugin.verson>3.8.0</maven.android.plugin.verson>
         <builder.helper.plugin.version>1.7</builder.helper.plugin.version>
@@ -73,7 +75,6 @@
         <!-- Android configs -->
         <android.platform>19</android.platform>
         <android.debug>false</android.debug>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <proguard.skip>true</proguard.skip>
 
     </properties>
@@ -116,37 +117,51 @@
         <dependency>
             <groupId>org.jboss.aerogear</groupId>
             <artifactId>aerogear-android-core</artifactId>
-            <type>apklib</type>
-            <version>${aerogear.android.version}</version>
+            <version>${aerogear.android.core.version}</version>
+            <type>apklib</type>            
         </dependency>
 
         <dependency>
             <groupId>org.jboss.aerogear</groupId>
             <artifactId>aerogear-android-core</artifactId>
-            <scope>provided</scope>
+            <version>${aerogear.android.core.version}</version>
             <type>jar</type>
-            <version>${aerogear.android.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.aerogear</groupId>
             <artifactId>aerogear-android-security</artifactId>
+            <version>${aerogear.android.security.version}</version>
             <type>apklib</type>
-            <version>${aerogear.android.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.aerogear</groupId>
             <artifactId>aerogear-android-security</artifactId>
-            <scope>provided</scope>
+            <version>${aerogear.android.security.version}</version>
             <type>jar</type>
-            <version>${aerogear.android.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.robolectric</groupId>
+            <artifactId>robolectric</artifactId>
+            <version>${roboeletric.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -167,7 +182,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>${maven.javadoc.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
