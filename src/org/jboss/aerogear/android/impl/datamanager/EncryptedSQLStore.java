@@ -31,7 +31,7 @@ import org.jboss.aerogear.android.impl.crypto.InvalidKeyException;
 import org.jboss.aerogear.android.impl.reflection.Property;
 import org.jboss.aerogear.android.impl.reflection.Scan;
 import org.jboss.aerogear.android.impl.util.CryptoUtils;
-import org.jboss.aerogear.crypto.Random;
+import org.jboss.aerogear.crypto.RandomUtils;
 import org.jboss.aerogear.crypto.keys.PrivateKey;
 import org.jboss.aerogear.crypto.password.Pbkdf2;
 
@@ -92,8 +92,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        byte[] salt = new Random().randomBytes();
-        byte[] iv = new Random().randomBytes();
+        byte[] salt = RandomUtils.randomBytes();
+        byte[] iv = RandomUtils.randomBytes();
 
         String SQL_CREATE_ENCRYPT_HELPER_TABLE = "CREATE TABLE IF NOT EXISTS " + getEncryptTableHelperName() +
                 " ( " +

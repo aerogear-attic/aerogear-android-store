@@ -23,7 +23,7 @@ import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.datamanager.StoreType;
 import org.jboss.aerogear.android.impl.crypto.InvalidKeyException;
 import org.jboss.aerogear.android.impl.util.CryptoUtils;
-import org.jboss.aerogear.crypto.Random;
+import org.jboss.aerogear.crypto.RandomUtils;
 import org.jboss.aerogear.crypto.keys.PrivateKey;
 import org.jboss.aerogear.crypto.password.Pbkdf2;
 
@@ -40,8 +40,8 @@ public class EncryptedMemoryStore<T> implements Store<T> {
     public EncryptedMemoryStore(IdGenerator idGenerator, String passphrase, Class<T> modelClass) {
         memoryStorage = new MemoryStorage(idGenerator);
 
-        byte[] iv = new Random().randomBytes();
-        byte[] salt = new Random().randomBytes();
+        byte[] iv = RandomUtils.randomBytes();
+        byte[] salt = RandomUtils.randomBytes();
         byte[] rawPassword = new byte[0];
 
         try {
