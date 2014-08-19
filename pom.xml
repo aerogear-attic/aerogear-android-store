@@ -33,6 +33,7 @@
 
      <modules>
         <module>aerogear-android-store</module>
+        <module>aerogear-android-store-test</module>
     </modules>
 
     <scm>
