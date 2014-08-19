@@ -16,6 +16,7 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
+
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.StoreType;
 import org.jboss.aerogear.android.impl.helper.Data;
@@ -25,39 +26,48 @@ import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
 import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Collection;
 
 import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
-import static org.junit.Assert.*;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.store.MainActivity;
 
-public class MemoryStorageTest {
+
+public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
     private MemoryStorage<Data> store;
     private StubIdGenerator stubIdGenerator;
 
-    @Before
-    public void setup() {
+    public MemoryStorageTest() {
+        super(MainActivity.class);
+    }
+
+    @Override
+    public void setUp() throws Exception{
+        super.setUp();
         stubIdGenerator = new StubIdGenerator();
         store = new MemoryStorage<Data>(stubIdGenerator);
     }
 
-    @Test
+    
     public void testStoreType() {
         assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    
     public void testStoreTypeThrowsException() {
-        DefaultStoreFactory factory = new DefaultStoreFactory();
-        StoreConfig config = new StoreConfig(Data.class);
-        config.setType(new FakeStoreType());
-        factory.createStore(config);
+        try {
+            DefaultStoreFactory factory = new DefaultStoreFactory();
+            StoreConfig config = new StoreConfig(Data.class);
+            config.setType(new FakeStoreType());
+            factory.createStore(config);
+        } catch (IllegalArgumentException ignore) {
+            return;
+        }
+        fail("Expected IllegalArgumentException");
     }
 
-    @Test
+    
     public void testReadAll() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -67,7 +77,7 @@ public class MemoryStorageTest {
         assertEquals("datas should 2 data", 2, datas.size());
     }
 
-    @Test
+    
     public void testReadWithFilter() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -77,7 +87,7 @@ public class MemoryStorageTest {
         assertEquals("datas should 2 data", 2, datas.size());
     }
 
-    @Test
+    
     public void testReadWithFilterPerPage() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -95,7 +105,7 @@ public class MemoryStorageTest {
         assertEquals("bar", datas.iterator().next().getName());
     }
 
-    @Test
+    
     public void testReadWithFilterWhere() throws JSONException {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -111,30 +121,33 @@ public class MemoryStorageTest {
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    
     public void testReadWithFilterThrowsExceptionWithNestingJSON() throws JSONException {
-
+        try {
         ReadFilter filter = new ReadFilter();
         filter.setWhere(new JSONObject("{\"name\":{\"name\":\"bar\"}}"));
 
         Collection<Data> datas = store.readWithFilter(filter);
+        } catch (IllegalArgumentException ignore) {
+            return;
+        }
+        fail("Expected IllegalArgumentException");
     }
 
-    @Test()
     public void testRead() {
         store.save(new Data("foo", "desc of foo"));
         Data data = store.read(1);
         assertNotNull("data could not be null", data);
     }
 
-    @Test
+    
     public void testSaveNoExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
         assertEquals(Integer.valueOf(1), data.getId());
     }
 
-    @Test
+    
     public void testSaveExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
@@ -150,19 +163,29 @@ public class MemoryStorageTest {
         assertEquals("desc of bar", data.getDescription());
     }
 
-    @Test(expected = RecordIdNotFoundException.class)
+    
     public void testSaveWithAnnotationNotConfigured() {
-        MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
-        memoryStorage.save(new DataWithNoIdConfigured());
+        try {
+            MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
+            memoryStorage.save(new DataWithNoIdConfigured());
+        } catch (RecordIdNotFoundException ignore) {
+            return;
+        }
+        fail("Expected RecordIdNotFoundException");
     }
 
-    @Test(expected = PropertyNotFoundException.class)
+    
     public void testSaveWithNoPropertyToSetId() {
-        MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
-        memoryStorage.save(new DataWithNoPropertyId());
+        try {
+            MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
+            memoryStorage.save(new DataWithNoPropertyId());
+        } catch (PropertyNotFoundException ignore) {
+            return;
+        }
+        fail("Expected PropertyNotFoundException");
     }
 
-    @Test
+    
     public void testReset() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -182,7 +205,7 @@ public class MemoryStorageTest {
         assertNull("bar should be null", bar);
     }
 
-    @Test
+    
     public void testRemove() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -202,12 +225,12 @@ public class MemoryStorageTest {
         assertNull("bar should be null", bar);
     }
 
-    @Test
+    
     public void testIsEmpty() {
         assertTrue("should be empty", store.isEmpty());
     }
 
-    @Test
+    
     public void testIsNotEmpty() {
         store.save(new Data("foo", "desc of foo"));
         assertFalse("should not be empty", store.isEmpty());

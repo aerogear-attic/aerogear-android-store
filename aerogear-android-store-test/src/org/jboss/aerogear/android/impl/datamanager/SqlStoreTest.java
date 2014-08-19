@@ -16,102 +16,106 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
+
 import android.content.Context;
+import android.test.RenamingDelegatingContext;
 import org.jboss.aerogear.android.Callback;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.RecordId;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.store.MainActivity;
 
-@RunWith(RobolectricTestRunner.class)
-public class SqlStoreTest {
+public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
+
+    public SqlStoreTest() {
+        super(MainActivity.class);
+    }
 
     private Context context;
     private SQLStore<Data> store;
     private SQLStore<TrivialNestedClass> nestedStore;
     private SQLStore<TrivialNestedClassWithCollection> nestedWithCollectionStore;
 
-    @Before
-    public void setUp() {
-        // Let's not run this test on Mac OS X with Java 1.7 until SQLite is compatible with that configuration
-        Assume.assumeTrue(!System.getProperty("os.name").toLowerCase().startsWith("mac os x")
-                || !System.getProperty("java.version").startsWith("1.7.0"));
+    @Override
+    protected void runTest() throws Throwable {
+        if (!System.getProperty("os.name").toLowerCase().startsWith("mac os x")
+                || !System.getProperty("java.version").startsWith("1.7.0")) {
+            super.runTest();
+        }
+    }
 
-        this.context = Robolectric.application.getApplicationContext();
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
         this.store = new SQLStore<Data>(Data.class, context);
         this.nestedStore = new SQLStore<TrivialNestedClass>(TrivialNestedClass.class, context);
         this.nestedWithCollectionStore = new SQLStore<TrivialNestedClassWithCollection>(TrivialNestedClassWithCollection.class, context);
     }
 
-    @Test
     public void testSave() throws InterruptedException {
-
         Data data = new Data(10, "name", "description");
         data.setEnable(true);
         saveData(10, "name", "description", true);
         Data readData = store.read(10);
-        Assert.assertEquals(data, readData);
+        assertEquals(data, readData);
     }
 
-    @Test
+    
     public void testReset() throws InterruptedException {
         saveData(10, "name", "description");
         store.reset();
         Data readData = store.read(10);
-        Assert.assertNull(readData);
+        assertNull(readData);
     }
 
-    @Test
+    
     public void testIsEmpty() throws InterruptedException {
         open(store);
-        Assert.assertTrue(store.isEmpty());
+        assertTrue(store.isEmpty());
     }
 
-    @Test
+    
     public void testIsNotEmpty() throws InterruptedException {
         saveData(10, "name", "description");
-        Assert.assertFalse(store.isEmpty());
+        assertFalse(store.isEmpty());
     }
 
-    @Test
+    
     public void testReadAll() throws InterruptedException, JSONException {
         loadBulkData();
         List<Data> allData = new ArrayList<Data>(store.readAll());
         Collections.sort(allData);
-        Assert.assertEquals(6, allData.size());
-        Assert.assertEquals("name", allData.get(0).getName());
-        Assert.assertEquals("name2", allData.get(5).getName());
+        assertEquals(6, allData.size());
+        assertEquals("name", allData.get(0).getName());
+        assertEquals("name2", allData.get(5).getName());
 
     }
 
-    @Test
+    
     public void testRemove() throws InterruptedException, JSONException {
         loadBulkData();
         store.remove(1);
 
         List<Data> allData = new ArrayList<Data>(store.readAll());
         Collections.sort(allData);
-        Assert.assertEquals(5, allData.size());
-        Assert.assertEquals(2l, (long) allData.get(0).getId());
-        Assert.assertEquals("name2", allData.get(4).getName());
+        assertEquals(5, allData.size());
+        assertEquals(2l, (long) allData.get(0).getId());
+        assertEquals("name2", allData.get(4).getName());
 
     }
 
-    @Test
+    
     public void testFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -120,14 +124,14 @@ public class SqlStoreTest {
         loadBulkData();
 
         result = store.readWithFilter(null);
-        Assert.assertEquals(6, result.size());
+        assertEquals(6, result.size());
 
         filter = new ReadFilter();
         where = new JSONObject();
         where.put("name", "name2");
         filter.setWhere(where);
         result = store.readWithFilter(filter);
-        Assert.assertEquals(3, result.size());
+        assertEquals(3, result.size());
 
         filter = new ReadFilter();
         where = new JSONObject();
@@ -135,11 +139,11 @@ public class SqlStoreTest {
         where.put("description", "description");
         filter.setWhere(where);
         result = store.readWithFilter(filter);
-        Assert.assertEquals(2, result.size());
+        assertEquals(2, result.size());
 
     }
 
-    @Test
+    
     public void testNestedSaveAndFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -163,13 +167,13 @@ public class SqlStoreTest {
         where.put("data", dataFilter);
         filter.setWhere(where);
         result = nestedStore.readWithFilter(filter);
-        Assert.assertEquals(1, result.size());
+        assertEquals(1, result.size());
         TrivialNestedClass nestedResult = result.get(0);
-        Assert.assertEquals("name", nestedResult.data.getName());
+        assertEquals("name", nestedResult.data.getName());
 
     }
 
-    @Test
+    
     public void testNestedListSaveAndFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -194,14 +198,14 @@ public class SqlStoreTest {
 
         filter.setWhere(where);
         result = nestedWithCollectionStore.readWithFilter(filter);
-        Assert.assertEquals(1, result.size());
+        assertEquals(1, result.size());
         TrivialNestedClassWithCollection nestedResult = result.get(0);
-        Assert.assertEquals((Integer) 10, nestedResult.data.get(0).getId());
-        Assert.assertEquals((Integer) 30, nestedResult.data.get(1).getId());
+        assertEquals((Integer) 10, nestedResult.data.get(0).getId());
+        assertEquals((Integer) 30, nestedResult.data.get(1).getId());
 
     }
 
-    @Test
+    
     public void testSuccessCallback() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(2);
         store.open(new Callback<SQLStore<Data>>() {
@@ -217,7 +221,7 @@ public class SqlStoreTest {
         });
 
         latch.await(5, TimeUnit.SECONDS);
-        Assert.assertEquals("OnSuccess should be called exactly once!", 1, latch.getCount());
+        assertEquals("OnSuccess should be called exactly once!", 1, latch.getCount());
 
     }
 
@@ -231,7 +235,7 @@ public class SqlStoreTest {
         store.save(new Data(id, name, desc, enable));
     }
 
-    @Test
+    
     public void testSaveListOfBoringData() throws InterruptedException {
         SQLStore<ListWithId> longStore = new SQLStore<ListWithId>(ListWithId.class, context);
         open(longStore);
@@ -243,7 +247,7 @@ public class SqlStoreTest {
             longList.data.add(i);
         }
         longStore.save(longList);
-        Assert.assertEquals(100, longStore.readAll().iterator().next().data.size());
+        assertEquals(100, longStore.readAll().iterator().next().data.size());
 
     }
 

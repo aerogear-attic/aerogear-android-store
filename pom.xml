@@ -47,7 +47,7 @@
 
         <!-- Project depencies versions -->
         <aerogear.bom.version>0.2.4</aerogear.bom.version>
-        <android.version>4.1.1.4</android.version>
+        <android.version>4.4.2_r3</android.version>
         <aerogear.android.core.version>2.0.0-SNAPSHOT</aerogear.android.core.version>
         <aerogear.android.security.version>2.0.0-SNAPSHOT</aerogear.android.security.version>
 
@@ -97,7 +97,7 @@
 
         <!-- Project dependencies -->
         <dependency>
-            <groupId>com.google.android</groupId>
+            <groupId>android</groupId>
             <artifactId>android</artifactId>
             <version>${android.version}</version>
             <scope>provided</scope>
@@ -137,20 +137,6 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <scope>compile</scope>
-        </dependency>
-
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.robolectric</groupId>
-            <artifactId>robolectric</artifactId>
-            <version>${roboeletric.version}</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>

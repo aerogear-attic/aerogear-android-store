@@ -16,39 +16,42 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
+import java.util.Collection;
+import static junit.framework.Assert.*;
 import org.jboss.aerogear.android.ReadFilter;
+import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
 import org.jboss.aerogear.android.impl.helper.DataWithNoPropertyId;
 import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
 import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
+import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 
-import java.util.Collection;
+public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
-import static org.junit.Assert.*;
-
-public class EncryptedMemoryStorageTest {
 
     private EncryptedMemoryStore<Data> store;
     private StubIdGenerator stubIdGenerator;
 
-    @Before
-    public void setup() {
+    public EncryptedMemoryStorageTest() {
+        super(MainActivity.class);
+    }
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         stubIdGenerator = new StubIdGenerator();
         String passphrase = "Lorem Ipsum";
         Class<Data> dataModel = Data.class;
         store = new EncryptedMemoryStore<Data>(stubIdGenerator, passphrase, dataModel);
     }
 
-    @Test
+    
     public void testStoreType() {
         assertEquals("verifying the type", ENCRYPTED_MEMORY, store.getType());
     }
 
-    @Test
     public void testReadAll() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -58,27 +61,28 @@ public class EncryptedMemoryStorageTest {
         assertEquals("datas should 2 data", 2, datas.size());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    
     public void testReadWithFilter() {
-        Collection<Data> datas = store.readWithFilter(new ReadFilter());
+        try {
+            Collection<Data> datas = store.readWithFilter(new ReadFilter());
+        } catch (UnsupportedOperationException ignore) {
+            return;
+        }
         fail("Should raise an exception");
     }
 
-    @Test()
     public void testRead() {
         store.save(new Data("foo", "desc of foo"));
         Data data = store.read(1);
         assertNotNull("data could not be null", data);
     }
 
-    @Test
     public void testSaveNoExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
         assertEquals(Integer.valueOf(1), data.getId());
     }
 
-    @Test
     public void testSaveExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
@@ -94,19 +98,28 @@ public class EncryptedMemoryStorageTest {
         assertEquals("desc of bar", data.getDescription());
     }
 
-    @Test(expected = RecordIdNotFoundException.class)
     public void testSaveWithAnnotationNotConfigured() {
-        MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
-        memoryStorage.save(new DataWithNoIdConfigured());
+        try {
+            MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
+            memoryStorage.save(new DataWithNoIdConfigured());
+        } catch (RecordIdNotFoundException ignore) {
+            return;
+        }
+        fail ("Expected RecordIdNotFoundException");
+        
     }
 
-    @Test(expected = PropertyNotFoundException.class)
+    
     public void testSaveWithNoPropertyToSetId() {
-        MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
-        memoryStorage.save(new DataWithNoPropertyId());
+        try { 
+            MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
+            memoryStorage.save(new DataWithNoPropertyId());
+         } catch (PropertyNotFoundException ignore) {
+            return;
+        }
+        fail ("Expected PropertyNotFoundException");
     }
 
-    @Test
     public void testReset() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -126,7 +139,6 @@ public class EncryptedMemoryStorageTest {
         assertNull("bar should be null", bar);
     }
 
-    @Test
     public void testRemove() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -146,12 +158,10 @@ public class EncryptedMemoryStorageTest {
         assertNull("bar should be null", bar);
     }
 
-    @Test
     public void testIsEmpty() {
         assertTrue("should be empty", store.isEmpty());
     }
 
-    @Test
     public void testIsNotEmpty() {
         store.save(new Data("foo", "desc of foo"));
         assertFalse("should not be empty", store.isEmpty());

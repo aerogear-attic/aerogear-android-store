@@ -16,36 +16,37 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
+
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.datamanager.StoreFactory;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.impl.helper.UnitTestUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 
 import java.net.MalformedURLException;
 
 import static junit.framework.Assert.*;
 import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
 import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.SQL;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.store.MainActivity;
 
-@RunWith(RobolectricTestRunner.class)
-public class DataManagerTest {
+public class DataManagerTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
+    public DataManagerTest() {
+        super(MainActivity.class);
+    }
     private DataManager dataManager;
 
-    @Before
-    public void setup() {
+    
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
         dataManager = new DataManager();
     }
 
-    @Test
-    public void constructors() throws Exception {
+    public void testConstructors() throws Exception {
         IdGenerator defaultGenerator = new DefaultIdGenerator();
         StoreFactory defaultFactory = new DefaultStoreFactory();
         DataManager manager = new DataManager(defaultGenerator);
@@ -63,7 +64,6 @@ public class DataManagerTest {
                             "idGenerator", IdGenerator.class));
     }
 
-    @Test
     public void testRegisterStoreFactory() throws MalformedURLException {
         @SuppressWarnings("LocalVariableHidesMemberVariable")
         DataManager dataManager = new DataManager(new StubStoreFactory());
@@ -74,7 +74,6 @@ public class DataManagerTest {
         assertEquals("verifying the type", "Stub", store.getType().getName());
     }
 
-    @Test
     public void testCreateStoreWithDefaultType() {
         Store store = dataManager.store("foo", Data.class);
 
@@ -82,7 +81,6 @@ public class DataManagerTest {
         assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    @Test
     public void testCreateStoreWithMemoryType() {
         Store store = dataManager.store("foo", new StoreConfig(Data.class));
 
@@ -90,7 +88,6 @@ public class DataManagerTest {
         assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    @Test
     public void testAddStoreWithDefaultType() {
         dataManager.store("foo", Data.class);
         Store store = dataManager.get("foo");
@@ -99,7 +96,6 @@ public class DataManagerTest {
         assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    @Test
     public void testAddStoreWithMemoryType() {
         dataManager.store("foo", new StoreConfig(Data.class));
         Store store = dataManager.get("foo");
@@ -108,10 +104,9 @@ public class DataManagerTest {
         assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    @Test
     public void testAddStoreWithSQLType() {
         StoreConfig sqlStoreConfig = new StoreConfig(Data.class);
-        sqlStoreConfig.setContext(Robolectric.application.getApplicationContext());
+        sqlStoreConfig.setContext(super.getActivity().getApplicationContext());
         sqlStoreConfig.setType(SQL);
         dataManager.store("foo", sqlStoreConfig);
         Store store = dataManager.get("foo");
@@ -119,7 +114,6 @@ public class DataManagerTest {
         assertEquals("verifying the type", SQL, store.getType());
     }
 
-    @Test
     public void testAndAddAndRemoveStores() {
         dataManager.store("foo", new StoreConfig(Data.class));
         dataManager.store("bar", Data.class);
