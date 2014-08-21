@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  JBoss, Home of Professional Open Source
+  Copyright Red Hat, Inc., and individual contributors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.jboss.aerogear</groupId>
+    <artifactId>aerogear-android-store-parent</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>AeroGear Android Store Parent</name>
+    <url>http://aerogear.org</url>
+
+    <parent>
+        <groupId>org.jboss.aerogear</groupId>
+        <artifactId>aerogear-parent</artifactId>
+        <version>0.2.4</version>
+    </parent>
+
+     <modules>
+        <module>aerogear-android-store</module>
+        <module>aerogear-android-store-test</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:git@github.com:aerogear/aerogear-android-store.git</connection>
+        <developerConnection>scm:git:git@github.com:aerogear/aerogear-android-store.git</developerConnection>
+        <url>git@github.com:aerogear/aerogear-android-store.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+
+        <!-- Project depencies versions -->
+        <aerogear.bom.version>0.2.4</aerogear.bom.version>
+        <android.version>4.4.2_r3</android.version>
+        <aerogear.android.core.version>2.0.0-SNAPSHOT</aerogear.android.core.version>
+        <aerogear.android.security.version>2.0.0-SNAPSHOT</aerogear.android.security.version>
+
+        <!-- Test dependencies -->
+        <junit.version>4.8.2</junit.version>
+        <roboeletric.version>2.2</roboeletric.version>
+
+        <!-- Plugins versions -->
+        <java.version>1.7</java.version>
+        <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
+        <maven.android.plugin.version>3.8.0</maven.android.plugin.version>
+        <builder.helper.plugin.version>1.7</builder.helper.plugin.version>
+
+        <!-- Android configs -->
+        <android.platform>19</android.platform>
+        <android.debug>false</android.debug>
+        <proguard.skip>true</proguard.skip>
+
+    </properties>
+
+    <dependencyManagement>
+
+        <dependencies>
+
+            <!-- AeroGear Dependencies BOM Imports -->
+            <dependency>
+                <groupId>org.jboss.aerogear</groupId>
+                <artifactId>aerogear-bom</artifactId>
+                <version>${aerogear.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- AeroGear Android Dependencies BOM Imports -->
+            <dependency>
+                <groupId>org.jboss.aerogear</groupId>
+                <artifactId>aerogear-android-bom</artifactId>
+                <version>${aerogear.bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- Project dependencies -->
+        <dependency>
+            <groupId>android</groupId>
+            <artifactId>android</artifactId>
+            <version>${android.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.aerogear</groupId>
+            <artifactId>aerogear-android-core</artifactId>
+            <version>${aerogear.android.core.version}</version>
+            <type>apklib</type>            
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.aerogear</groupId>
+            <artifactId>aerogear-android-core</artifactId>
+            <version>${aerogear.android.core.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.aerogear</groupId>
+            <artifactId>aerogear-android-security</artifactId>
+            <version>${aerogear.android.security.version}</version>
+            <type>apklib</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.aerogear</groupId>
+            <artifactId>aerogear-android-security</artifactId>
+            <version>${aerogear.android.security.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test</testSourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                    <artifactId>android-maven-plugin</artifactId>
+                    <version>${maven.android.plugin.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourcepath>${basedir}/src</sourcepath>
+                    <sourceFileExcludes>
+                        <exclude>
+                            **com/google/**
+                        </exclude>
+                        <exclude>**/R.java</exclude>
+                    </sourceFileExcludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+
