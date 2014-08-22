@@ -327,7 +327,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
                     onReady.onSuccess(SQLStore.this);
                 }
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
     }
 
     public void openSync() {
