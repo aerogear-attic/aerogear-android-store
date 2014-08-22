@@ -81,7 +81,7 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     
     public void testIsEmpty() throws InterruptedException {
-        open(store);
+        store.openSync();
         assertTrue(store.isEmpty());
     }
 
@@ -156,7 +156,7 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         newNested.setText("nestedText");
         newNested.setData(data);
 
-        open(nestedStore);
+        nestedStore.openSync();
         nestedStore.save(newNested);
 
         filter = new ReadFilter();
@@ -188,7 +188,7 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         newNested.setText("nestedText");
         newNested.setData(data);
 
-        open(nestedWithCollectionStore);
+        nestedWithCollectionStore.openSync();
         nestedWithCollectionStore.save(newNested);
 
         filter = new ReadFilter();
@@ -226,19 +226,19 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
     }
 
     private void saveData(Integer id, String name, String desc) throws InterruptedException {
-        open(store);
+        store.openSync();
         store.save(new Data(id, name, desc));
     }
 
     private void saveData(Integer id, String name, String desc, boolean enable) throws InterruptedException {
-        open(store);
+        store.openSync();
         store.save(new Data(id, name, desc, enable));
     }
 
     
     public void testSaveListOfBoringData() throws InterruptedException {
         SQLStore<ListWithId> longStore = new SQLStore<ListWithId>(ListWithId.class, context);
-        open(longStore);
+        longStore.openSync();
         ListWithId<Long> longList = new ListWithId<Long>(100);
 
         longList.setId(1);
@@ -249,23 +249,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         longStore.save(longList);
         assertEquals(100, longStore.readAll().iterator().next().data.size());
 
-    }
-
-    private <T> void open(SQLStore<T> store) throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
-        store.open(new Callback<SQLStore<T>>() {
-            @Override
-            public void onSuccess(SQLStore<T> sqlStore) {
-                latch.countDown();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                latch.countDown();
-                throw new RuntimeException(e);
-            }
-        });
-        latch.await();
     }
 
     private void loadBulkData() throws InterruptedException {
