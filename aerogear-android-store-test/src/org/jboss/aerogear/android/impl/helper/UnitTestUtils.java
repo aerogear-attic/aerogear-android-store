@@ -92,4 +92,16 @@ public class UnitTestUtils {
 
     }
 
+    static boolean equals(Object object1, Object object2) {
+        
+        if (object1 == object2) {//Same object or both null
+            return true;
+        } else if (object1 == null || object2 == null) {//One or the other is null but not both
+            return false;
+        } 
+        
+        return object1.equals(object2);
+        
+    }
+
 }

@@ -18,7 +18,6 @@ package org.jboss.aerogear.android.impl.helper;
 
 import org.jboss.aerogear.android.RecordId;
 
-import java.util.Objects;
 
 public class Data implements Comparable<Data> {
 
@@ -87,13 +86,13 @@ public class Data implements Comparable<Data> {
             return false;
         }
         final Data other = (Data) obj;
-        if (!Objects.equals(this.id, other.id)) {
+        if (!UnitTestUtils.equals(this.id, other.id)) {
             return false;
         }
-        if (!Objects.equals(this.name, other.name)) {
+        if (!UnitTestUtils.equals(this.name, other.name)) {
             return false;
         }
-        if (!Objects.equals(this.description, other.description)) {
+        if (!UnitTestUtils.equals(this.description, other.description)) {
             return false;
         }
         if (this.enable != other.enable) {
