@@ -117,6 +117,7 @@
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
                 <configuration>
+                    <adbConnectionTimeout>30000</adbConnectionTimeout>
                     <test>
                         <debug>${android.debug}</debug>
                     </test>
