@@ -220,8 +220,7 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
             }
         });
 
-        latch.await(5, TimeUnit.SECONDS);
-        assertEquals("OnSuccess should be called exactly once!", 1, latch.getCount());
+        assertFalse("OnSuccess should be called exactly once!", latch.await(5, TimeUnit.SECONDS));
 
     }
 
