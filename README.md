@@ -8,7 +8,12 @@ AeroGear Android Store is a simple data storage API. This API is useful for cach
 
 ## Building
 
-Until the 2.0 modules are stable and in Maven Central, we will need to build the projects first.  Please take a look of the [step by step on our website](http://aerogear.org/docs/guides/aerogear-android/HowToBuildAeroGearAndroidLibrary/)
+Until the 2.0 modules are stable and in Maven Central, we will need to build the projects first. Please take a look of the [step by step on our website](http://aerogear.org/docs/guides/aerogear-android/HowToBuildAeroGearAndroidLibrary/). 
+
+*The following dependencies are required to build this project:*
+
+* [aerogear-android-core](http://github.com/aerogear/aerogear-android-core) 
+* [aerogear-android-security](http://github.com/aerogear/aerogear-android-security) 
 
 ## Usage
 
