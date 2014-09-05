@@ -151,6 +151,14 @@
                     <artifactId>android-maven-plugin</artifactId>
                     <version>${maven.android.plugin.version}</version>
                     <extensions>true</extensions>
+                    <configuration>
+                        <dex>
+                            <jvmArguments>
+                                <jvmArgument>-Xms256m</jvmArgument>
+                                <jvmArgument>-Xmx4096m</jvmArgument>
+                            </jvmArguments>
+                        </dex>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
