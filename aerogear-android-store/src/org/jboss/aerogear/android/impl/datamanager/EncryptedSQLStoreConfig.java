@@ -22,7 +22,7 @@ import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class EncryptedSQLStoreConfig extends StoreConfig2<EncryptedSQLStoreConfig>
+public final class EncryptedSQLStoreConfig extends StoreConfig<EncryptedSQLStoreConfig>
         implements Config<EncryptedSQLStoreConfig> {
 
     private Class klass;

@@ -20,7 +20,7 @@ import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class EncryptedMemoryStoreConfig extends StoreConfig2<EncryptedMemoryStoreConfig>
+public final class EncryptedMemoryStoreConfig extends StoreConfig<EncryptedMemoryStoreConfig>
         implements Config<EncryptedMemoryStoreConfig> {
 
     private IdGenerator idGenerator = new DefaultIdGenerator();

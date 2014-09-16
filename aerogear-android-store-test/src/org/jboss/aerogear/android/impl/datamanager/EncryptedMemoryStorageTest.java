@@ -16,7 +16,7 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import org.jboss.aerogear.android.DataManager2;
+import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.store.MainActivity;
@@ -41,7 +41,7 @@ public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationT
         String passphrase = "Lorem Ipsum";
         Class<Data> dataModel = Data.class;
 
-        store = DataManager2
+        store = DataManager
                 .config("testMemoryStore", EncryptedMemoryStoreConfig.class)
                 .setIdGenerator(stubIdGenerator)
                 .setPassphrase(passphrase)

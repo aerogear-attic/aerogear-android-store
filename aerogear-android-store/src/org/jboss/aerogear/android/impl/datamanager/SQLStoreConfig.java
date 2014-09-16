@@ -22,7 +22,7 @@ import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class SQLStoreConfig extends StoreConfig2<SQLStoreConfig> implements Config<SQLStoreConfig> {
+public final class SQLStoreConfig extends StoreConfig<SQLStoreConfig> implements Config<SQLStoreConfig> {
 
     private Class klass;
     private Context context;

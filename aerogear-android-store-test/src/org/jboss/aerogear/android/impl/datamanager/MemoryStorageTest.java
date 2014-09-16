@@ -16,7 +16,7 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import org.jboss.aerogear.android.DataManager2;
+import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.StoreType;
 import org.jboss.aerogear.android.impl.helper.Data;
@@ -33,7 +33,6 @@ import java.util.Collection;
 
 import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
 
-
 public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
     private MemoryStorage<Data> store;
@@ -47,7 +46,7 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
     public void setUp() throws Exception {
         super.setUp();
         stubIdGenerator = new StubIdGenerator();
-        store = DataManager2
+        store = DataManager
                 .config("testMemoryStore", MemoryStoreConfig.class)
                 .setIdGenerator(stubIdGenerator)
                 .createMemoryStore();
@@ -55,18 +54,6 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
 
     public void testStoreType() {
         assertEquals("verifying the type", MEMORY, store.getType());
-    }
-
-    public void testStoreTypeThrowsException() {
-        try {
-            DefaultStoreFactory factory = new DefaultStoreFactory();
-            StoreConfig config = new StoreConfig(Data.class);
-            config.setType(new FakeStoreType());
-            factory.createStore(config);
-        } catch (IllegalArgumentException ignore) {
-            return;
-        }
-        fail("Expected IllegalArgumentException");
     }
 
 

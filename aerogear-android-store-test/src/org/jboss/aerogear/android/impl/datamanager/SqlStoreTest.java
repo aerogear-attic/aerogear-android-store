@@ -18,10 +18,7 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import android.content.Context;
 import android.test.RenamingDelegatingContext;
-import org.jboss.aerogear.android.Callback;
-import org.jboss.aerogear.android.DataManager2;
-import org.jboss.aerogear.android.ReadFilter;
-import org.jboss.aerogear.android.RecordId;
+import org.jboss.aerogear.android.*;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
@@ -59,20 +56,20 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         super.setUp();
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
 
-        this.store = DataManager2
+        this.store = DataManager
                 .config("store", SQLStoreConfig.class)
                 .setKlass(Data.class)
                 .setContext(context)
                 .createSQLStore();
 
 
-        this.nestedStore = DataManager2
+        this.nestedStore = DataManager
                 .config("trivialNestedClass", SQLStoreConfig.class)
                 .setKlass(TrivialNestedClass.class)
                 .setContext(context)
                 .createSQLStore();
 
-        this.nestedWithCollectionStore = DataManager2
+        this.nestedWithCollectionStore = DataManager
                 .config("trivialNestedClassWithCollection", SQLStoreConfig.class)
                 .setKlass(TrivialNestedClassWithCollection.class)
                 .setContext(context)

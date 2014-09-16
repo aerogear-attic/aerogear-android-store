@@ -16,115 +16,44 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import android.content.Context;
-import com.google.gson.GsonBuilder;
-import org.jboss.aerogear.android.datamanager.IdGenerator;
-import org.jboss.aerogear.android.datamanager.Store;
-import org.jboss.aerogear.android.datamanager.StoreFactory;
-import org.jboss.aerogear.android.datamanager.StoreType;
+import org.jboss.aerogear.android.Config;
+import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-/**
- * This class bundles up all of the possible variables which may be used to instantiate a {@link Store}
- */
-public final class StoreConfig {
+import java.util.Collection;
+import java.util.HashSet;
 
-    /**
-     * An Android Context, used by {@link SQLStore}
-     */
-    private Context context;
+public abstract class StoreConfig<CFG extends StoreConfig<CFG>> implements Config<CFG> {
 
-    /**
-     * The Class of the store, should be the same as the parameterized class
-     * of the Store.  Used by {@link SQLStore}
-     */
-    private final Class klass;
-
-    /**
-     * The type of Store this instance will build when consumed by a {@link StoreFactory}
-     * Defaults to MEMORY.
-     */
-    private StoreType type = StoreTypes.MEMORY;
-
-    /**
-     * The builder to use to manage objects.  Used by {@link SQLStore}
-     * Defaults to new GsonBuilder();
-     */
-    private GsonBuilder builder = new GsonBuilder();
-
-    /**
-     * The IdGenerator used by the Store.  Used by {@link SQLStore} and {@link MemoryStorage}.
-     * Defaults to new DefaultIdGenerator();
-     */
-    private IdGenerator idGenerator = new DefaultIdGenerator();
-
-    /**
-     * The PrivateKey used to crypt/decrypt data
-     */
-    private String passphrase;
-    
-    /**
-     * The name of the store, defaults to klass.getSimpleName
-     */ 
     private String name;
+    private Collection<OnStoreCreatedListener> listeners;
 
-    public StoreConfig(Class klass) {
-        this.klass = klass;
+    public StoreConfig() {
+        listeners = new HashSet<OnStoreCreatedListener>();
     }
 
-    public Context getContext() {
-        return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    public Class getKlass() {
-        return klass;
-    }
-
-    public StoreType getType() {
-        return type;
-    }
-
-    public void setType(StoreType type) {
-        this.type = type;
-    }
-
-    public GsonBuilder getBuilder() {
-        return builder;
-    }
-
-    public void setBuilder(GsonBuilder builder) {
-        this.builder = builder;
-    }
-
-    public IdGenerator getIdGenerator() {
-        return idGenerator;
-    }
-
-    public void setIdGenerator(IdGenerator idGenerator) {
-        this.idGenerator = idGenerator;
-    }
-
-    public String getPassphrase() {
-        return passphrase;
-    }
-
-    public void setPassphrase(String passphrase) {
-        this.passphrase = passphrase;
-    }
-
+    @Override
     public String getName() {
-        if ((name == null || name.isEmpty()) && klass != null) {
-            return klass.getSimpleName();
-        } else {
-            return name;
-        }
+        return name;
     }
 
-    public void setName(String name) {
+    @Override
+    public CFG setName(String name) {
         this.name = name;
+        return (CFG) this;
     }
-    
+
+    public Collection<OnStoreCreatedListener> getOnStoreCreatedListeners() {
+        return listeners;
+    }
+
+    public CFG addOnStoreCreatedListener(OnStoreCreatedListener listener) {
+        this.listeners.add(listener);
+        return (CFG) this;
+    }
+
+    public CFG setOnStoreCreatedListeners(Collection<OnStoreCreatedListener> listeners) {
+        listeners.addAll(listeners);
+        return (CFG) this;
+    }
+
 }
