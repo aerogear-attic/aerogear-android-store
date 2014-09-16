@@ -40,6 +40,8 @@ public final class DataManager2 {
     static {
         DataManager2.registerConfigurationProvider(MemoryStoreConfig.class, new MemoryStoreConfigurationProvider());
         DataManager2.registerConfigurationProvider(SQLStoreConfig.class, new SQLStoreConfigurationProvider());
+        DataManager2.registerConfigurationProvider(EncryptedMemoryStoreConfig.class, new EncryptedMemoryStoreConfigurationProvider());
+        DataManager2.registerConfigurationProvider(EncryptedSQLStoreConfig.class, new EncryptedSQLStoreConfigurationProvider());
     }
 
     private DataManager2() {
