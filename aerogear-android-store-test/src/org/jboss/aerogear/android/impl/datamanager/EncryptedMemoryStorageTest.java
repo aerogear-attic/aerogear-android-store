@@ -16,23 +16,19 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import java.util.Collection;
-import static junit.framework.Assert.*;
+import org.jboss.aerogear.android.DataManager2;
 import org.jboss.aerogear.android.ReadFilter;
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
-import org.jboss.aerogear.android.impl.helper.DataWithNoPropertyId;
-import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
-import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 
+import java.util.Collection;
+
+import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
+
 public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-
     private EncryptedMemoryStore<Data> store;
-    private StubIdGenerator stubIdGenerator;
 
     public EncryptedMemoryStorageTest() {
         super(MainActivity.class);
@@ -41,10 +37,16 @@ public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationT
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        stubIdGenerator = new StubIdGenerator();
+        StubIdGenerator stubIdGenerator = new StubIdGenerator();
         String passphrase = "Lorem Ipsum";
         Class<Data> dataModel = Data.class;
-        store = new EncryptedMemoryStore<Data>(stubIdGenerator, passphrase, dataModel);
+
+        store = DataManager2
+                .config("testMemoryStore", EncryptedMemoryStoreConfig.class)
+                .setIdGenerator(stubIdGenerator)
+                .setPassphrase(passphrase)
+                .setKlass(dataModel)
+                .createEncryptedMemoryStore();
     }
 
     
@@ -96,28 +98,6 @@ public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationT
         assertEquals(Integer.valueOf(1), data.getId());
         assertEquals("bar", data.getName());
         assertEquals("desc of bar", data.getDescription());
-    }
-
-    public void testSaveWithAnnotationNotConfigured() {
-        try {
-            MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoIdConfigured());
-        } catch (RecordIdNotFoundException ignore) {
-            return;
-        }
-        fail ("Expected RecordIdNotFoundException");
-        
-    }
-
-    
-    public void testSaveWithNoPropertyToSetId() {
-        try { 
-            MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoPropertyId());
-         } catch (PropertyNotFoundException ignore) {
-            return;
-        }
-        fail ("Expected PropertyNotFoundException");
     }
 
     public void testReset() {
