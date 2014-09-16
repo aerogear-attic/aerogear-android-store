@@ -18,9 +18,7 @@ package org.jboss.aerogear.android;
 
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 import org.jboss.aerogear.android.datamanager.Store;
-import org.jboss.aerogear.android.impl.datamanager.MemoryStoreConfig;
-import org.jboss.aerogear.android.impl.datamanager.MemoryStoreConfigurationProvider;
-import org.jboss.aerogear.android.impl.datamanager.StoreConfig2;
+import org.jboss.aerogear.android.impl.datamanager.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +39,7 @@ public final class DataManager2 {
 
     static {
         DataManager2.registerConfigurationProvider(MemoryStoreConfig.class, new MemoryStoreConfigurationProvider());
+        DataManager2.registerConfigurationProvider(SQLStoreConfig.class, new SQLStoreConfigurationProvider());
     }
 
     private DataManager2() {

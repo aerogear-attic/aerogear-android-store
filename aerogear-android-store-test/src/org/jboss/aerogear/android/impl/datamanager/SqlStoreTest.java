@@ -16,13 +16,15 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-
 import android.content.Context;
 import android.test.RenamingDelegatingContext;
 import org.jboss.aerogear.android.Callback;
+import org.jboss.aerogear.android.DataManager2;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.RecordId;
 import org.jboss.aerogear.android.impl.helper.Data;
+import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,8 +34,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
-import org.jboss.aerogear.android.store.MainActivity;
 
 public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
@@ -58,9 +58,25 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
     public void setUp() throws Exception {
         super.setUp();
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
-        this.store = new SQLStore<Data>(Data.class, context);
-        this.nestedStore = new SQLStore<TrivialNestedClass>(TrivialNestedClass.class, context);
-        this.nestedWithCollectionStore = new SQLStore<TrivialNestedClassWithCollection>(TrivialNestedClassWithCollection.class, context);
+
+        this.store = DataManager2
+                .config("store", SQLStoreConfig.class)
+                .setKlass(Data.class)
+                .setContext(context)
+                .createSQLStore();
+
+
+        this.nestedStore = DataManager2
+                .config("trivialNestedClass", SQLStoreConfig.class)
+                .setKlass(TrivialNestedClass.class)
+                .setContext(context)
+                .createSQLStore();
+
+        this.nestedWithCollectionStore = DataManager2
+                .config("trivialNestedClassWithCollection", SQLStoreConfig.class)
+                .setKlass(TrivialNestedClassWithCollection.class)
+                .setContext(context)
+                .createSQLStore();
     }
 
     public void testSave() throws InterruptedException {
@@ -71,7 +87,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         assertEquals(data, readData);
     }
 
-    
     public void testReset() throws InterruptedException {
         saveData(10, "name", "description");
         store.reset();
@@ -79,19 +94,16 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         assertNull(readData);
     }
 
-    
     public void testIsEmpty() throws InterruptedException {
         store.openSync();
         assertTrue(store.isEmpty());
     }
 
-    
     public void testIsNotEmpty() throws InterruptedException {
         saveData(10, "name", "description");
         assertFalse(store.isEmpty());
     }
 
-    
     public void testReadAll() throws InterruptedException, JSONException {
         loadBulkData();
         List<Data> allData = new ArrayList<Data>(store.readAll());
@@ -102,7 +114,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testRemove() throws InterruptedException, JSONException {
         loadBulkData();
         store.remove(1);
@@ -115,7 +126,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -143,7 +153,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testNestedSaveAndFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -173,7 +182,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testNestedListSaveAndFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -205,7 +213,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testSuccessCallback() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(2);
         store.open(new Callback<SQLStore<Data>>() {
@@ -234,7 +241,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         store.save(new Data(id, name, desc, enable));
     }
 
-    
     public void testSaveListOfBoringData() throws InterruptedException {
         SQLStore<ListWithId> longStore = new SQLStore<ListWithId>(ListWithId.class, context);
         longStore.openSync();
@@ -289,6 +295,7 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         public void setData(Data data) {
             this.data = data;
         }
+
     }
 
     public static final class TrivialNestedClassWithCollection {
