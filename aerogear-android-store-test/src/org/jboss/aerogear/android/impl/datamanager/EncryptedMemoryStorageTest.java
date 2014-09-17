@@ -18,6 +18,7 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
+import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
@@ -28,7 +29,7 @@ import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_M
 
 public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-    private EncryptedMemoryStore<Data> store;
+    private Store<Data> store;
 
     public EncryptedMemoryStorageTest() {
         super(MainActivity.class);

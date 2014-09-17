@@ -119,7 +119,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
         }
 
         @Override
-        public <T> Store<T> store() {
+        public <T> Store<T> buildStore() {
             return null;
         }
     }

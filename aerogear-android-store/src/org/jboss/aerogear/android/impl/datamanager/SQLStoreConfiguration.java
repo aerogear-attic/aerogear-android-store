@@ -20,7 +20,7 @@ import android.content.Context;
 import com.google.gson.GsonBuilder;
 import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
-import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
+import org.jboss.aerogear.android.datamanager.Store;
 
 public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConfiguration>
         implements Config<SQLStoreConfiguration> {
@@ -51,14 +51,8 @@ public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConf
     }
 
     @Override
-    public <T> SQLStore<T> store() {
-        SQLStore<T> sqlStore = new SQLStore<T>(klass, context, builder, idGenerator);
-
-        for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
-            listener.onStoreCreated(this, sqlStore);
-        }
-
-        return sqlStore;
+    public <T> Store<T> buildStore() {
+        return new SQLStore<T>(klass, context, builder, idGenerator);
     }
 
 }

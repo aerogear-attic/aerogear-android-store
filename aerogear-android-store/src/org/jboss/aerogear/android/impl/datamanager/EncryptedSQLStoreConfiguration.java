@@ -20,7 +20,7 @@ import android.content.Context;
 import com.google.gson.GsonBuilder;
 import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
-import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
+import org.jboss.aerogear.android.datamanager.Store;
 
 public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<EncryptedSQLStoreConfiguration>
         implements Config<EncryptedSQLStoreConfiguration> {
@@ -57,14 +57,8 @@ public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<Enc
     }
 
     @Override
-    public <T> EncryptedSQLStore<T> store() {
-        EncryptedSQLStore<T> encryptedSQLStore = new EncryptedSQLStore<T>(klass, context, builder, idGenerator, passphrase);
-
-        for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
-            listener.onStoreCreated(this, encryptedSQLStore);
-        }
-
-        return encryptedSQLStore;
+    public <T> Store<T> buildStore() {
+        return new EncryptedSQLStore<T>(klass, context, builder, idGenerator, passphrase);
     }
 
 }

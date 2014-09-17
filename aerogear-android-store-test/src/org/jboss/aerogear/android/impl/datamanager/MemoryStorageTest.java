@@ -18,6 +18,7 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
+import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.datamanager.StoreType;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
@@ -35,7 +36,7 @@ import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
 
 public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-    private MemoryStorage<Data> store;
+    private Store<Data> store;
     private StubIdGenerator stubIdGenerator;
 
     public MemoryStorageTest() {

@@ -18,7 +18,7 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
-import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
+import org.jboss.aerogear.android.datamanager.Store;
 
 public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<EncryptedMemoryStoreConfiguration>
         implements Config<EncryptedMemoryStoreConfiguration> {
@@ -43,14 +43,8 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
     }
 
     @Override
-    public <T> EncryptedMemoryStore<T> store() {
-        EncryptedMemoryStore<T> encryptedMemoryStore = new EncryptedMemoryStore<T>(idGenerator, passphrase, klass);
-
-        for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
-            listener.onStoreCreated(this, encryptedMemoryStore);
-        }
-
-        return encryptedMemoryStore;
+    public <T> Store<T> buildStore() {
+        return new EncryptedMemoryStore<T>(idGenerator, passphrase, klass);
     }
 
 }

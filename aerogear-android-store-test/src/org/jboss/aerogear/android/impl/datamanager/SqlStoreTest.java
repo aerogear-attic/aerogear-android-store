@@ -56,20 +56,20 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         super.setUp();
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
 
-        this.store = DataManager
+        this.store = (SQLStore) DataManager
                 .config("store", SQLStoreConfiguration.class)
                 .setKlass(Data.class)
                 .setContext(context)
                 .store();
 
 
-        this.nestedStore = DataManager
+        this.nestedStore = (SQLStore) DataManager
                 .config("trivialNestedClass", SQLStoreConfiguration.class)
                 .setKlass(TrivialNestedClass.class)
                 .setContext(context)
                 .store();
 
-        this.nestedWithCollectionStore = DataManager
+        this.nestedWithCollectionStore = (SQLStore) DataManager
                 .config("trivialNestedClassWithCollection", SQLStoreConfiguration.class)
                 .setKlass(TrivialNestedClassWithCollection.class)
                 .setContext(context)
