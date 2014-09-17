@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AeroGear Android Store</string>
+
+    <string name="app_name">AeroGear Store Integration Tests</string>
+    <string name="message">This APP is used to run the\nAeroGear Android Store Integration test\nYou can uninstall that :)</string>
+
 </resources>
