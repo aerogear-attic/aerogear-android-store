@@ -17,14 +17,11 @@
 package org.jboss.aerogear.android.impl.datamanager;
 
 
+import org.jboss.aerogear.android.ConfigurationProvider;
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.datamanager.Store;
-import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
-
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.SQL;
 
 public class DataManagerTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
@@ -37,7 +34,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
         super.setUp();
     }
 
-    public void testCreateStoreWithDefaultType() {
+    public void testCreateStore() {
         Store store = DataManager
                 .config("foo1", MemoryStoreConfig.class)
                 .createMemoryStore();
@@ -45,37 +42,81 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
         assertNotNull("store could not be null", store);
     }
 
-    public void testCreateStoreWithMemoryType() {
-        Store store = DataManager
+    public void testGetStore() {
+        DataManager
                 .config("foo2", MemoryStoreConfig.class)
                 .createMemoryStore();
 
+        Store store = DataManager.getStore("foo2");
+
         assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    public void testAddStoreWithMemoryType() {
-        DataManager
+    public void testCreateStoreType() {
+        Store store = DataManager
                 .config("foo3", MemoryStoreConfig.class)
                 .createMemoryStore();
 
-        Store store = DataManager.getStore("foo3");
-
         assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", MEMORY, store.getType());
+        assertEquals("store type should be MEMORY", StoreTypes.MEMORY, store.getType());
     }
 
-    public void testAddStoreWithSQLType() {
+    public void testCreateMoreThanOneStoreInDataManager() {
         DataManager
-                .config("foo4", SQLStoreConfig.class)
-                .setKlass(Data.class)
-                .setContext(super.getActivity().getApplicationContext())
+                .config("foo4", MemoryStoreConfig.class)
+                .createMemoryStore();
+
+        DataManager
+                .config("foo5", MemoryStoreConfig.class)
+                .createMemoryStore();
+
+        Store store1 = DataManager.getStore("foo4");
+        Store store2 = DataManager.getStore("foo5");
+
+        assertNotNull("store could not be null", store1);
+        assertNotNull("store could not be null", store2);
+    }
+
+    public void testCreateDiferentStore() {
+
+        DataManager
+                .config("foo6", MemoryStoreConfig.class)
+                .createMemoryStore();
+
+        DataManager
+                .config("foo7", SQLStoreConfig.class)
+                .setKlass(String.class)
+                .setContext(getActivity().getApplicationContext())
                 .createSQLStore();
 
-        Store store = DataManager.getStore("foo4");
+        Store memoryStore = DataManager.getStore("foo6");
+        Store sqlStore = DataManager.getStore("foo7");
 
-        assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", SQL, store.getType());
+        assertNotNull("store could not be null", memoryStore);
+        assertEquals("store type should be MEMORY", StoreTypes.MEMORY, memoryStore.getType());
+
+        assertNotNull("store could not be null", sqlStore);
+        assertEquals("store type should be MEMORY", StoreTypes.SQL, sqlStore.getType());
+    }
+
+    public void testAddSimpleAuthenticator() {
+
+        DataManager.registerConfigurationProvider(StubStoreConfig.class, new DummyStoreConfigProvider());
+        StubStoreConfig config = DataManager.config("test", StubStoreConfig.class);
+        assertNotNull(config);
+
+    }
+
+    private static final class DummyStoreConfigProvider implements ConfigurationProvider<StubStoreConfig> {
+        @Override
+        public StubStoreConfig newConfiguration() {
+            return new StubStoreConfig();
+        }
+    }
+
+    private static class StubStoreConfig extends StoreConfig<StubStoreConfig> {
+        public StubStoreConfig() {
+        }
     }
 
 }
