@@ -17,8 +17,10 @@
 package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.Config;
+import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
+import org.jboss.aerogear.android.datamanager.Store;
 
 public final class MemoryStoreConfiguration extends StoreConfiguration<MemoryStoreConfiguration>
         implements Config<MemoryStoreConfiguration> {
@@ -30,7 +32,8 @@ public final class MemoryStoreConfiguration extends StoreConfiguration<MemorySto
         return this;
     }
 
-    public <T> MemoryStorage<T> createMemoryStore() {
+    @Override
+    public <T> MemoryStorage<T> store() {
         MemoryStorage<T> memoryCache = new MemoryStorage<T>(idGenerator);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {

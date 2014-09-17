@@ -46,7 +46,7 @@ public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationT
                 .setIdGenerator(stubIdGenerator)
                 .setPassphrase(passphrase)
                 .setKlass(dataModel)
-                .createEncryptedMemoryStore();
+                .store();
     }
 
     

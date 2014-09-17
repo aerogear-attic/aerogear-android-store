@@ -50,7 +50,8 @@ public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConf
         return this;
     }
 
-    public <T> SQLStore<T> createSQLStore() {
+    @Override
+    public <T> SQLStore<T> store() {
         SQLStore<T> sqlStore = new SQLStore<T>(klass, context, builder, idGenerator);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {

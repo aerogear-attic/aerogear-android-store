@@ -18,6 +18,7 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
+import org.jboss.aerogear.android.datamanager.Store;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -56,5 +57,7 @@ public abstract class StoreConfiguration<CONFIGURATION extends StoreConfiguratio
         listeners.addAll(listeners);
         return (CONFIGURATION) this;
     }
+
+    public abstract <T> Store<T> store();
 
 }

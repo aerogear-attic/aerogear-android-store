@@ -42,7 +42,8 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
         return this;
     }
 
-    public <T> EncryptedMemoryStore<T> createEncryptedMemoryStore() {
+    @Override
+    public <T> EncryptedMemoryStore<T> store() {
         EncryptedMemoryStore<T> encryptedMemoryStore = new EncryptedMemoryStore<T>(idGenerator, passphrase, klass);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {

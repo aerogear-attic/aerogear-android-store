@@ -49,7 +49,7 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         store = DataManager
                 .config("testMemoryStore", MemoryStoreConfiguration.class)
                 .setIdGenerator(stubIdGenerator)
-                .createMemoryStore();
+                .store();
     }
 
     public void testStoreType() {

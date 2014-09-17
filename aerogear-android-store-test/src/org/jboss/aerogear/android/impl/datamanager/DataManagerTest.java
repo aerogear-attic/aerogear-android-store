@@ -37,7 +37,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
     public void testCreateStore() {
         Store store = DataManager
                 .config("foo1", MemoryStoreConfiguration.class)
-                .createMemoryStore();
+                .store();
 
         assertNotNull("store could not be null", store);
     }
@@ -45,7 +45,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
     public void testGetStore() {
         DataManager
                 .config("foo2", MemoryStoreConfiguration.class)
-                .createMemoryStore();
+                .store();
 
         Store store = DataManager.getStore("foo2");
 
@@ -55,7 +55,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
     public void testCreateStoreType() {
         Store store = DataManager
                 .config("foo3", MemoryStoreConfiguration.class)
-                .createMemoryStore();
+                .store();
 
         assertNotNull("store could not be null", store);
         assertEquals("store type should be MEMORY", StoreTypes.MEMORY, store.getType());
@@ -64,11 +64,11 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
     public void testCreateMoreThanOneStoreInDataManager() {
         DataManager
                 .config("foo4", MemoryStoreConfiguration.class)
-                .createMemoryStore();
+                .store();
 
         DataManager
                 .config("foo5", MemoryStoreConfiguration.class)
-                .createMemoryStore();
+                .store();
 
         Store store1 = DataManager.getStore("foo4");
         Store store2 = DataManager.getStore("foo5");
@@ -81,13 +81,13 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
 
         DataManager
                 .config("foo6", MemoryStoreConfiguration.class)
-                .createMemoryStore();
+                .store();
 
         DataManager
                 .config("foo7", SQLStoreConfiguration.class)
                 .setKlass(String.class)
                 .setContext(getActivity().getApplicationContext())
-                .createSQLStore();
+                .store();
 
         Store memoryStore = DataManager.getStore("foo6");
         Store sqlStore = DataManager.getStore("foo7");
@@ -114,8 +114,13 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
         }
     }
 
-    private static class StubStoreConfiguration extends StoreConfiguration<StubStoreConfig> {
+    private static class StubStoreConfiguration extends StoreConfiguration<StubStoreConfiguration> {
         public StubStoreConfiguration() {
+        }
+
+        @Override
+        public <T> Store<T> store() {
+            return null;
         }
     }
 

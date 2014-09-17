@@ -60,20 +60,20 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
                 .config("store", SQLStoreConfiguration.class)
                 .setKlass(Data.class)
                 .setContext(context)
-                .createSQLStore();
+                .store();
 
 
         this.nestedStore = DataManager
                 .config("trivialNestedClass", SQLStoreConfiguration.class)
                 .setKlass(TrivialNestedClass.class)
                 .setContext(context)
-                .createSQLStore();
+                .store();
 
         this.nestedWithCollectionStore = DataManager
                 .config("trivialNestedClassWithCollection", SQLStoreConfiguration.class)
                 .setKlass(TrivialNestedClassWithCollection.class)
                 .setContext(context)
-                .createSQLStore();
+                .store();
     }
 
     public void testSave() throws InterruptedException {

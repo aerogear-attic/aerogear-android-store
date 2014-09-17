@@ -56,7 +56,8 @@ public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<Enc
         return this;
     }
 
-    public <T> EncryptedSQLStore<T> createEncryptedSQLStore() {
+    @Override
+    public <T> EncryptedSQLStore<T> store() {
         EncryptedSQLStore<T> encryptedSQLStore = new EncryptedSQLStore<T>(klass, context, builder, idGenerator, passphrase);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
