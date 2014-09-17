@@ -22,7 +22,8 @@ import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 import java.util.Collection;
 import java.util.HashSet;
 
-public abstract class StoreConfiguration<CFG extends StoreConfiguration<CFG>> implements Config<CFG> {
+public abstract class StoreConfiguration<CONFIGURATION extends StoreConfiguration<CONFIGURATION>>
+        implements Config<CONFIGURATION> {
 
     private String name;
     private Collection<OnStoreCreatedListener> listeners;
@@ -37,23 +38,23 @@ public abstract class StoreConfiguration<CFG extends StoreConfiguration<CFG>> im
     }
 
     @Override
-    public CFG setName(String name) {
+    public CONFIGURATION setName(String name) {
         this.name = name;
-        return (CFG) this;
+        return (CONFIGURATION) this;
     }
 
     public Collection<OnStoreCreatedListener> getOnStoreCreatedListeners() {
         return listeners;
     }
 
-    public CFG addOnStoreCreatedListener(OnStoreCreatedListener listener) {
+    public CONFIGURATION addOnStoreCreatedListener(OnStoreCreatedListener listener) {
         this.listeners.add(listener);
-        return (CFG) this;
+        return (CONFIGURATION) this;
     }
 
-    public CFG setOnStoreCreatedListeners(Collection<OnStoreCreatedListener> listeners) {
+    public CONFIGURATION setOnStoreCreatedListeners(Collection<OnStoreCreatedListener> listeners) {
         listeners.addAll(listeners);
-        return (CFG) this;
+        return (CONFIGURATION) this;
     }
 
 }

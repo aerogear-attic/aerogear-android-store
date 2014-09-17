@@ -20,7 +20,8 @@ import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class MemoryStoreConfiguration extends StoreConfiguration<MemoryStoreConfiguration> implements Config<MemoryStoreConfiguration> {
+public final class MemoryStoreConfiguration extends StoreConfiguration<MemoryStoreConfiguration>
+        implements Config<MemoryStoreConfiguration> {
 
     private IdGenerator idGenerator = new DefaultIdGenerator();
 

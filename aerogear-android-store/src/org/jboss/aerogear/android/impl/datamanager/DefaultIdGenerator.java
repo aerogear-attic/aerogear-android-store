@@ -27,7 +27,7 @@ public class DefaultIdGenerator implements IdGenerator {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @return {@link java.util.UUID}
      */
     @Override

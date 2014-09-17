@@ -56,7 +56,6 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     private SQLiteDatabase database;
     private final Gson gson;
     private final IdGenerator generator;
-    
 
     public SQLStore(Class<T> klass, Context context) {
         super(context, klass.getSimpleName(), null, 1);
@@ -81,7 +80,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         this.gson = builder.create();
         this.generator = generator;
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -161,7 +160,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         Map<String, AtomicInteger> resultCount = new HashMap<String, AtomicInteger>();
         buildKeyValuePairs(where, queryList, "");
 
-        if (queryList.isEmpty()) {//there is no query
+        if (queryList.isEmpty()) {// there is no query
             return new ArrayList<T>(readAll());
         } else {
             for (Pair<String, String> kv : queryList) {
@@ -182,7 +181,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         List<T> results = new ArrayList<T>();
 
         for (String id : resultCount.keySet()) {
-            if (resultCount.get(id).get() == queryList.size()) {//There are as many objects as queries which meant a result was returned for every query
+            if (resultCount.get(id).get() == queryList.size()) {// There are as many objects as queries which meant a result was returned for every query
                 results.add(read(id));
             }
         }
@@ -333,7 +332,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     public void openSync() {
         SQLStore.this.database = getWritableDatabase();
     }
-    
+
     @Override
     public void close() {
         this.database.close();
@@ -389,7 +388,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private void buildKeyValuePairs(JsonObject where, List<Pair<String, String>> keyValues, String parentPath) {
         Set<Entry<String, JsonElement>> keys = where.entrySet();
-        String pathVar = parentPath.isEmpty() ? "" : ".";//Set a dot if parent path is not empty
+        String pathVar = parentPath.isEmpty() ? "" : ".";// Set a dot if parent path is not empty
         for (Entry<String, JsonElement> entry : keys) {
             String key = entry.getKey();
             String path = parentPath + pathVar + key;

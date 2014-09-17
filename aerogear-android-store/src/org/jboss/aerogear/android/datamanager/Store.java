@@ -29,21 +29,21 @@ public interface Store<T> {
 
     /**
      * Returns the type of the underlying 'store implementation'
-     *
+     * 
      * @return StoreType
      */
     public StoreType getType();
 
     /**
      * Reads all the data from the underlying storage system.
-     *
+     * 
      * @return List of T
      */
     public Collection<T> readAll();
 
     /**
      * Reads a specific object/record from the underlying storage system.
-     *
+     * 
      * @param id id from the desired object
      * @return T
      */
@@ -51,7 +51,7 @@ public interface Store<T> {
 
     /**
      * Search for objects/records from the underlying storage system.
-     *
+     * 
      * @param filter a filter to use to fetch an object
      * @return a list of elements, should not be null.
      */
@@ -59,7 +59,7 @@ public interface Store<T> {
 
     /**
      * Saves the given object in the underlying storage system.
-     *
+     * 
      * @param item Object to save
      */
     public void save(T item);
@@ -71,14 +71,14 @@ public interface Store<T> {
 
     /**
      * Removes a specific object/record from the underlying storage system.
-     *
+     * 
      * @param id Id of item to remote
      */
     public void remove(Serializable id);
 
     /**
      * Checks if the storage system contains no stored elements.
-     *
+     * 
      * @return true if the storage is empty, otherwise false.
      */
     public boolean isEmpty();
