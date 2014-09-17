@@ -16,47 +16,27 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import android.content.Context;
-import com.google.gson.GsonBuilder;
 import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class SQLStoreConfig extends StoreConfig<SQLStoreConfig> implements Config<SQLStoreConfig> {
+public final class MemoryStoreConfiguration extends StoreConfiguration<MemoryStoreConfiguration> implements Config<MemoryStoreConfiguration> {
 
-    private Class klass;
-    private Context context;
-    private GsonBuilder builder = new GsonBuilder();
     private IdGenerator idGenerator = new DefaultIdGenerator();
 
-    public SQLStoreConfig setKlass(Class klass) {
-        this.klass = klass;
-        return this;
-    }
-
-    public SQLStoreConfig setContext(Context context) {
-        this.context = context;
-        return this;
-    }
-
-    public SQLStoreConfig setBuilder(GsonBuilder builder) {
-        this.builder = builder;
-        return this;
-    }
-
-    public SQLStoreConfig setIdGenerator(IdGenerator idGenerator) {
+    public MemoryStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
 
-    public <T> SQLStore<T> createSQLStore() {
-        SQLStore<T> sqlStore = new SQLStore<T>(klass, context, builder, idGenerator);
+    public <T> MemoryStorage<T> createMemoryStore() {
+        MemoryStorage<T> memoryCache = new MemoryStorage<T>(idGenerator);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
-            listener.onStoreCreated(this, sqlStore);
+            listener.onStoreCreated(this, memoryCache);
         }
 
-        return sqlStore;
+        return memoryCache;
     }
 
 }

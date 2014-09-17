@@ -18,11 +18,11 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.ConfigurationProvider;
 
-public class SQLStoreConfigurationProvider implements ConfigurationProvider<SQLStoreConfig> {
+public class SQLStoreConfigurationProvider implements ConfigurationProvider<SQLStoreConfiguration> {
 
     @Override
-    public SQLStoreConfig newConfiguration() {
-        return new SQLStoreConfig();
+    public SQLStoreConfiguration newConfiguration() {
+        return new SQLStoreConfiguration();
     }
 
 }

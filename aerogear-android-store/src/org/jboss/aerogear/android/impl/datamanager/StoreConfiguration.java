@@ -22,12 +22,12 @@ import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 import java.util.Collection;
 import java.util.HashSet;
 
-public abstract class StoreConfig<CFG extends StoreConfig<CFG>> implements Config<CFG> {
+public abstract class StoreConfiguration<CFG extends StoreConfiguration<CFG>> implements Config<CFG> {
 
     private String name;
     private Collection<OnStoreCreatedListener> listeners;
 
-    public StoreConfig() {
+    public StoreConfiguration() {
         listeners = new HashSet<OnStoreCreatedListener>();
     }
 

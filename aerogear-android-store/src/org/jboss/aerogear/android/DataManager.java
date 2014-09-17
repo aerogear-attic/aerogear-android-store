@@ -27,36 +27,36 @@ public final class DataManager {
 
     private static Map<String, Store<?>> stores = new HashMap<String, Store<?>>();
 
-    private static Map<Class<? extends StoreConfig<?>>, ConfigurationProvider<?>>
-            configurationProviderMap = new HashMap<Class<? extends StoreConfig<?>>, ConfigurationProvider<?>>();
+    private static Map<Class<? extends StoreConfiguration<?>>, ConfigurationProvider<?>>
+            configurationProviderMap = new HashMap<Class<? extends StoreConfiguration<?>>, ConfigurationProvider<?>>();
 
     private static OnStoreCreatedListener onStoreCreatedListener = new OnStoreCreatedListener() {
         @Override
-        public void onStoreCreated(StoreConfig<?> configuration, Store<?> store) {
+        public void onStoreCreated(StoreConfiguration<?> configuration, Store<?> store) {
             stores.put(configuration.getName(), store);
         }
     };
 
     static {
-        DataManager.registerConfigurationProvider(MemoryStoreConfig.class, new MemoryStoreConfigurationProvider());
-        DataManager.registerConfigurationProvider(SQLStoreConfig.class, new SQLStoreConfigurationProvider());
-        DataManager.registerConfigurationProvider(EncryptedMemoryStoreConfig.class, new EncryptedMemoryStoreConfigurationProvider());
-        DataManager.registerConfigurationProvider(EncryptedSQLStoreConfig.class, new EncryptedSQLStoreConfigurationProvider());
+        DataManager.registerConfigurationProvider(MemoryStoreConfiguration.class, new MemoryStoreConfigurationProvider());
+        DataManager.registerConfigurationProvider(SQLStoreConfiguration.class, new SQLStoreConfigurationProvider());
+        DataManager.registerConfigurationProvider(EncryptedMemoryStoreConfiguration.class, new EncryptedMemoryStoreConfigurationProvider());
+        DataManager.registerConfigurationProvider(EncryptedSQLStoreConfiguration.class, new EncryptedSQLStoreConfigurationProvider());
     }
 
     private DataManager() {
     }
 
-    public static <CFG extends StoreConfig<CFG>> void registerConfigurationProvider
+    public static <CFG extends StoreConfiguration<CFG>> void registerConfigurationProvider
             (Class<CFG> configurationClass, ConfigurationProvider<CFG> provider) {
         configurationProviderMap.put(configurationClass, provider);
     }
 
-    public static <CFG extends StoreConfig<CFG>> CFG config(String name, Class<CFG> storeImplementationClass) {
+    public static <CFG extends StoreConfiguration<CFG>> CFG config(String name, Class<CFG> storeImplementationClass) {
 
         @SuppressWarnings("unchecked")
-        ConfigurationProvider<? extends StoreConfig<CFG>> provider =
-                (ConfigurationProvider<? extends StoreConfig<CFG>>)
+        ConfigurationProvider<? extends StoreConfiguration<CFG>> provider =
+                (ConfigurationProvider<? extends StoreConfiguration<CFG>>)
                         configurationProviderMap.get(storeImplementationClass);
 
         if (provider == null) {

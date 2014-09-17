@@ -20,23 +20,36 @@ import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class MemoryStoreConfig extends StoreConfig<MemoryStoreConfig> implements Config<MemoryStoreConfig> {
+public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<EncryptedMemoryStoreConfiguration>
+        implements Config<EncryptedMemoryStoreConfiguration> {
 
     private IdGenerator idGenerator = new DefaultIdGenerator();
+    private String passphrase;
+    private Class klass;
 
-    public MemoryStoreConfig setIdGenerator(IdGenerator idGenerator) {
+    public EncryptedMemoryStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
 
-    public <T> MemoryStorage<T> createMemoryStore() {
-        MemoryStorage<T> memoryCache = new MemoryStorage<T>(idGenerator);
+    public EncryptedMemoryStoreConfiguration setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+        return this;
+    }
+
+    public EncryptedMemoryStoreConfiguration setKlass(Class klass) {
+        this.klass = klass;
+        return this;
+    }
+
+    public <T> EncryptedMemoryStore<T> createEncryptedMemoryStore() {
+        EncryptedMemoryStore<T> encryptedMemoryStore = new EncryptedMemoryStore<T>(idGenerator, passphrase, klass);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
-            listener.onStoreCreated(this, memoryCache);
+            listener.onStoreCreated(this, encryptedMemoryStore);
         }
 
-        return memoryCache;
+        return encryptedMemoryStore;
     }
 
 }

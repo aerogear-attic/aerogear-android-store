@@ -16,10 +16,10 @@
  */
 package org.jboss.aerogear.android.datamanager;
 
-import org.jboss.aerogear.android.impl.datamanager.StoreConfig;
+import org.jboss.aerogear.android.impl.datamanager.StoreConfiguration;
 
 public interface OnStoreCreatedListener {
 
-    void onStoreCreated(StoreConfig<?> configuration, Store<?> store);
+    void onStoreCreated(StoreConfiguration<?> configuration, Store<?> store);
 
 }

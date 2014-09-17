@@ -18,11 +18,11 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.ConfigurationProvider;
 
-public class MemoryStoreConfigurationProvider implements ConfigurationProvider<MemoryStoreConfig> {
+public class MemoryStoreConfigurationProvider implements ConfigurationProvider<MemoryStoreConfiguration> {
 
     @Override
-    public MemoryStoreConfig newConfiguration() {
-        return new MemoryStoreConfig();
+    public MemoryStoreConfiguration newConfiguration() {
+        return new MemoryStoreConfiguration();
     }
 
 }

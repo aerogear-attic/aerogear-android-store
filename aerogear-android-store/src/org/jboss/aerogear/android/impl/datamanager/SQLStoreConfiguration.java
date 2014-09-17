@@ -22,48 +22,41 @@ import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.OnStoreCreatedListener;
 
-public final class EncryptedSQLStoreConfig extends StoreConfig<EncryptedSQLStoreConfig>
-        implements Config<EncryptedSQLStoreConfig> {
+public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConfiguration> implements Config<SQLStoreConfiguration> {
 
     private Class klass;
     private Context context;
     private GsonBuilder builder = new GsonBuilder();
     private IdGenerator idGenerator = new DefaultIdGenerator();
-    private String passphrase;
 
-    public EncryptedSQLStoreConfig setKlass(Class klass) {
+    public SQLStoreConfiguration setKlass(Class klass) {
         this.klass = klass;
         return this;
     }
 
-    public EncryptedSQLStoreConfig setContext(Context context) {
+    public SQLStoreConfiguration setContext(Context context) {
         this.context = context;
         return this;
     }
 
-    public EncryptedSQLStoreConfig setBuilder(GsonBuilder builder) {
+    public SQLStoreConfiguration setBuilder(GsonBuilder builder) {
         this.builder = builder;
         return this;
     }
 
-    public EncryptedSQLStoreConfig setIdGenerator(IdGenerator idGenerator) {
+    public SQLStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
 
-    public EncryptedSQLStoreConfig setPassphrase(String passphrase) {
-        this.passphrase = passphrase;
-        return this;
-    }
-
-    public <T> EncryptedSQLStore<T> createEncryptedSQLStore() {
-        EncryptedSQLStore<T> encryptedSQLStore = new EncryptedSQLStore<T>(klass, context, builder, idGenerator, passphrase);
+    public <T> SQLStore<T> createSQLStore() {
+        SQLStore<T> sqlStore = new SQLStore<T>(klass, context, builder, idGenerator);
 
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
-            listener.onStoreCreated(this, encryptedSQLStore);
+            listener.onStoreCreated(this, sqlStore);
         }
 
-        return encryptedSQLStore;
+        return sqlStore;
     }
 
 }

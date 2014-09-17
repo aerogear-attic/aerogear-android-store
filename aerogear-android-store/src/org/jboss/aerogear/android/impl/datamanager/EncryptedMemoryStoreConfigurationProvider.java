@@ -18,11 +18,11 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.ConfigurationProvider;
 
-public class EncryptedMemoryStoreConfigurationProvider implements ConfigurationProvider<EncryptedMemoryStoreConfig> {
+public class EncryptedMemoryStoreConfigurationProvider implements ConfigurationProvider<EncryptedMemoryStoreConfiguration> {
 
     @Override
-    public EncryptedMemoryStoreConfig newConfiguration() {
-        return new EncryptedMemoryStoreConfig();
+    public EncryptedMemoryStoreConfiguration newConfiguration() {
+        return new EncryptedMemoryStoreConfiguration();
     }
 
 }

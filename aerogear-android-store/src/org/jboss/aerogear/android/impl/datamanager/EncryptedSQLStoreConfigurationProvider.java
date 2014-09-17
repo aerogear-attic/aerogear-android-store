@@ -18,11 +18,11 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.ConfigurationProvider;
 
-public class EncryptedSQLStoreConfigurationProvider implements ConfigurationProvider<EncryptedSQLStoreConfig> {
+public class EncryptedSQLStoreConfigurationProvider implements ConfigurationProvider<EncryptedSQLStoreConfiguration> {
 
     @Override
-    public EncryptedSQLStoreConfig newConfiguration() {
-        return new EncryptedSQLStoreConfig();
+    public EncryptedSQLStoreConfiguration newConfiguration() {
+        return new EncryptedSQLStoreConfiguration();
     }
 
 }

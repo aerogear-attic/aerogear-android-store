@@ -42,7 +42,7 @@ public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationT
         Class<Data> dataModel = Data.class;
 
         store = DataManager
-                .config("testMemoryStore", EncryptedMemoryStoreConfig.class)
+                .config("testMemoryStore", EncryptedMemoryStoreConfiguration.class)
                 .setIdGenerator(stubIdGenerator)
                 .setPassphrase(passphrase)
                 .setKlass(dataModel)
