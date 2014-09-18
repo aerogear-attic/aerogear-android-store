@@ -49,7 +49,7 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         stubIdGenerator = new StubIdGenerator();
         store = DataManager
                 .config("testMemoryStore", MemoryStoreConfiguration.class)
-                .setIdGenerator(stubIdGenerator)
+                .withIdGenerator(stubIdGenerator)
                 .store();
     }
 

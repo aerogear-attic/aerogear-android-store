@@ -25,7 +25,7 @@ public final class MemoryStoreConfiguration extends StoreConfiguration<MemorySto
 
     private IdGenerator idGenerator = new DefaultIdGenerator();
 
-    public MemoryStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
+    public MemoryStoreConfiguration withIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
