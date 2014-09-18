@@ -31,22 +31,22 @@ public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<Enc
     private IdGenerator idGenerator = new DefaultIdGenerator();
     private String passphrase;
 
-    public EncryptedSQLStoreConfiguration setKlass(Class klass) {
+    public EncryptedSQLStoreConfiguration forClass(Class klass) {
         this.klass = klass;
         return this;
     }
 
-    public EncryptedSQLStoreConfiguration setContext(Context context) {
+    public EncryptedSQLStoreConfiguration withContext(Context context) {
         this.context = context;
         return this;
     }
 
-    public EncryptedSQLStoreConfiguration setBuilder(GsonBuilder builder) {
+    public EncryptedSQLStoreConfiguration withGsonBuilder(GsonBuilder builder) {
         this.builder = builder;
         return this;
     }
 
-    public EncryptedSQLStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
+    public EncryptedSQLStoreConfiguration withIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
