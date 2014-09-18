@@ -34,11 +34,11 @@ import java.util.List;
 
 public class EncryptedMemoryStore<T> implements Store<T> {
 
-    private final MemoryStorage<byte[]> memoryStorage;
+    private final MemoryStore<byte[]> memoryStore;
     private final CryptoUtils<T> cryptoUtils;
 
     public EncryptedMemoryStore(IdGenerator idGenerator, String passphrase, Class<T> modelClass) {
-        memoryStorage = new MemoryStorage(idGenerator);
+        memoryStore = new MemoryStore(idGenerator);
 
         byte[] iv = RandomUtils.randomBytes();
         byte[] salt = RandomUtils.randomBytes();
@@ -67,7 +67,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException {
-        Collection<byte[]> encryptedCollection = memoryStorage.readAll();
+        Collection<byte[]> encryptedCollection = memoryStore.readAll();
         return cryptoUtils.decrypt(encryptedCollection);
     }
 
@@ -76,7 +76,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public T read(Serializable id) throws InvalidKeyException {
-        byte[] encryptedItem = memoryStorage.read(id);
+        byte[] encryptedItem = memoryStore.read(id);
         if (encryptedItem == null) {
             return null;
         } else {
@@ -97,8 +97,8 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public void save(T item) {
-        Serializable idValue = memoryStorage.getOrGenerateIdValue(item);
-        memoryStorage.save(idValue, cryptoUtils.encrypt(item));
+        Serializable idValue = memoryStore.getOrGenerateIdValue(item);
+        memoryStore.save(idValue, cryptoUtils.encrypt(item));
     }
 
     /**
@@ -106,7 +106,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public void reset() {
-        memoryStorage.reset();
+        memoryStore.reset();
     }
 
     /**
@@ -114,7 +114,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public void remove(Serializable id) {
-        memoryStorage.remove(id);
+        memoryStore.remove(id);
     }
 
     /**
@@ -122,7 +122,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public boolean isEmpty() {
-        return memoryStorage.isEmpty();
+        return memoryStore.isEmpty();
     }
 
 }

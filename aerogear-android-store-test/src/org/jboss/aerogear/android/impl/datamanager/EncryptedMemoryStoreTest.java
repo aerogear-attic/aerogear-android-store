@@ -19,44 +19,41 @@ package org.jboss.aerogear.android.impl.datamanager;
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.Store;
-import org.jboss.aerogear.android.datamanager.StoreType;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
-import org.jboss.aerogear.android.impl.helper.DataWithNoPropertyId;
-import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
-import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Collection;
 
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
+import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
 
-public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
+public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
     private Store<Data> store;
-    private StubIdGenerator stubIdGenerator;
 
-    public MemoryStorageTest() {
+    public EncryptedMemoryStoreTest() {
         super(MainActivity.class);
     }
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        stubIdGenerator = new StubIdGenerator();
+        StubIdGenerator stubIdGenerator = new StubIdGenerator();
+        String passphrase = "Lorem Ipsum";
+        Class<Data> dataModel = Data.class;
+
         store = DataManager
-                .config("testMemoryStore", MemoryStoreConfiguration.class)
+                .config("testMemoryStore", EncryptedMemoryStoreConfiguration.class)
                 .withIdGenerator(stubIdGenerator)
+                .usingPassphrase(passphrase)
+                .forClass(dataModel)
                 .store();
     }
 
+    
     public void testStoreType() {
-        assertEquals("verifying the type", MEMORY, store.getType());
+        assertEquals("verifying the type", ENCRYPTED_MEMORY, store.getType());
     }
-
 
     public void testReadAll() {
         store.save(new Data("foo", "desc of foo"));
@@ -67,56 +64,14 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertEquals("datas should 2 data", 2, datas.size());
     }
 
+    
     public void testReadWithFilter() {
-        store.save(new Data("foo", "desc of foo"));
-        store.save(new Data("bar", "desc of bar"));
-
-        Collection<Data> datas = store.readWithFilter(new ReadFilter());
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 2 data", 2, datas.size());
-    }
-
-    public void testReadWithFilterPerPage() {
-        store.save(new Data("foo", "desc of foo"));
-        store.save(new Data("bar", "desc of bar"));
-
-        ReadFilter filter = new ReadFilter();
-        filter.setLimit(1);
-
-        Collection<Data> datas = store.readWithFilter(filter);
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 1 data", 1, datas.size());
-        assertEquals("foo", datas.iterator().next().getName());
-
-        filter.setOffset(1);
-        datas = store.readWithFilter(filter);
-        assertEquals("bar", datas.iterator().next().getName());
-    }
-
-    public void testReadWithFilterWhere() throws JSONException {
-        store.save(new Data("foo", "desc of foo"));
-        store.save(new Data("bar", "desc of bar"));
-
-        ReadFilter filter = new ReadFilter();
-        filter.setWhere(new JSONObject("{\"name\":\"bar\"}"));
-
-        Collection<Data> datas = store.readWithFilter(filter);
-
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 1 data", 1, datas.size());
-        assertEquals("bar", datas.iterator().next().getName());
-    }
-
-    public void testReadWithFilterThrowsExceptionWithNestingJSON() throws JSONException {
         try {
-            ReadFilter filter = new ReadFilter();
-            filter.setWhere(new JSONObject("{\"name\":{\"name\":\"bar\"}}"));
-
-            Collection<Data> datas = store.readWithFilter(filter);
-        } catch (IllegalArgumentException ignore) {
+            Collection<Data> datas = store.readWithFilter(new ReadFilter());
+        } catch (UnsupportedOperationException ignore) {
             return;
         }
-        fail("Expected IllegalArgumentException");
+        fail("Should raise an exception");
     }
 
     public void testRead() {
@@ -144,26 +99,6 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertEquals(Integer.valueOf(1), data.getId());
         assertEquals("bar", data.getName());
         assertEquals("desc of bar", data.getDescription());
-    }
-
-    public void testSaveWithAnnotationNotConfigured() {
-        try {
-            MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoIdConfigured());
-        } catch (RecordIdNotFoundException ignore) {
-            return;
-        }
-        fail("Expected RecordIdNotFoundException");
-    }
-
-    public void testSaveWithNoPropertyToSetId() {
-        try {
-            MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoPropertyId());
-        } catch (PropertyNotFoundException ignore) {
-            return;
-        }
-        fail("Expected PropertyNotFoundException");
     }
 
     public void testReset() {
@@ -208,17 +143,9 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertTrue("should be empty", store.isEmpty());
     }
 
-
     public void testIsNotEmpty() {
         store.save(new Data("foo", "desc of foo"));
         assertFalse("should not be empty", store.isEmpty());
-    }
-
-    private static class FakeStoreType implements StoreType {
-        @Override
-        public String getName() {
-            return "FAKE";
-        }
     }
 
 }

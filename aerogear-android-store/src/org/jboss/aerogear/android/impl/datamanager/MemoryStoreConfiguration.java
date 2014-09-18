@@ -32,7 +32,7 @@ public final class MemoryStoreConfiguration extends StoreConfiguration<MemorySto
 
     @Override
     public <T> Store<T> buildStore() {
-        return new MemoryStorage<T>(idGenerator);
+        return new MemoryStore<T>(idGenerator);
     }
 
 }
