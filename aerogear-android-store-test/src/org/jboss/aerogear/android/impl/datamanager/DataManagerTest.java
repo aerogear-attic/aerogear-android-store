@@ -99,7 +99,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
         assertEquals("store type should be MEMORY", StoreTypes.SQL, sqlStore.getType());
     }
 
-    public void testAddSimpleAuthenticator() {
+    public void testAddNewProvider() {
 
         DataManager.registerConfigurationProvider(StubStoreConfiguration.class, new DummyStoreConfigProvider());
         StubStoreConfiguration config = DataManager.config("test", StubStoreConfiguration.class);
