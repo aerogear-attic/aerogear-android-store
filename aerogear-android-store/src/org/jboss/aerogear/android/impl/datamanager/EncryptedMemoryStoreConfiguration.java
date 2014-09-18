@@ -27,17 +27,17 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
     private String passphrase;
     private Class klass;
 
-    public EncryptedMemoryStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
+    public EncryptedMemoryStoreConfiguration withIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
 
-    public EncryptedMemoryStoreConfiguration setPassphrase(String passphrase) {
+    public EncryptedMemoryStoreConfiguration usingPassphrase(String passphrase) {
         this.passphrase = passphrase;
         return this;
     }
 
-    public EncryptedMemoryStoreConfiguration setKlass(Class klass) {
+    public EncryptedMemoryStoreConfiguration forClass(Class klass) {
         this.klass = klass;
         return this;
     }
