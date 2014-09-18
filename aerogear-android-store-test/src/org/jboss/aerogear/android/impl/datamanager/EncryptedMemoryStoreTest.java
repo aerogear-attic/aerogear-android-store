@@ -16,6 +16,7 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
+import junit.framework.Assert;
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.Store;
@@ -50,7 +51,55 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
                 .store();
     }
 
-    
+    public void testCreateSQLStoreWithoutKlass() {
+
+        try {
+            Store<Data> store1 = DataManager.config("store1", EncryptedMemoryStoreConfiguration.class)
+                    .usingPassphrase("AeroGear")
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store1.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutPassphrase() {
+
+        try {
+            Store<Data> store2 = DataManager.config("store2", EncryptedMemoryStoreConfiguration.class)
+                    .forClass(Data.class)
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store2.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutPassphraseAndKlass() {
+
+        try {
+            Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store();
+
+            Data data = new Data(10, "name", "description");
+            store3.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
     public void testStoreType() {
         assertEquals("verifying the type", ENCRYPTED_MEMORY, store.getType());
     }

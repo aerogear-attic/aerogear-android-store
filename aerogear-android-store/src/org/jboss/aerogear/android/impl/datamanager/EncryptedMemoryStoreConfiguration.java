@@ -44,6 +44,10 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
 
     @Override
     public <T> Store<T> buildStore() {
+        if((klass == null) || (passphrase == null)) {
+            throw new IllegalStateException("Klass and Passphrase are mandatory");
+        }
+
         return new EncryptedMemoryStore<T>(idGenerator, passphrase, klass);
     }
 
