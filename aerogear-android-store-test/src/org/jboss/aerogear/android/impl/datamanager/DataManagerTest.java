@@ -85,8 +85,8 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
 
         DataManager
                 .config("foo7", SQLStoreConfiguration.class)
-                .setKlass(String.class)
-                .setContext(getActivity().getApplicationContext())
+                .forClass(String.class)
+                .withContext(getActivity().getApplicationContext())
                 .store();
 
         Store memoryStore = DataManager.getStore("foo6");

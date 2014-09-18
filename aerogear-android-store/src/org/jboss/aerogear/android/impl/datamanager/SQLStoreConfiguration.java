@@ -30,22 +30,22 @@ public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConf
     private GsonBuilder builder = new GsonBuilder();
     private IdGenerator idGenerator = new DefaultIdGenerator();
 
-    public SQLStoreConfiguration setKlass(Class klass) {
+    public SQLStoreConfiguration forClass(Class klass) {
         this.klass = klass;
         return this;
     }
 
-    public SQLStoreConfiguration setContext(Context context) {
+    public SQLStoreConfiguration withContext(Context context) {
         this.context = context;
         return this;
     }
 
-    public SQLStoreConfiguration setBuilder(GsonBuilder builder) {
+    public SQLStoreConfiguration withGsonBuilder(GsonBuilder builder) {
         this.builder = builder;
         return this;
     }
 
-    public SQLStoreConfiguration setIdGenerator(IdGenerator idGenerator) {
+    public SQLStoreConfiguration withIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }

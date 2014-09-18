@@ -58,21 +58,21 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
         this.store = (SQLStore) DataManager
                 .config("store", SQLStoreConfiguration.class)
-                .setKlass(Data.class)
-                .setContext(context)
+                .forClass(Data.class)
+                .withContext(context)
                 .store();
 
 
         this.nestedStore = (SQLStore) DataManager
                 .config("trivialNestedClass", SQLStoreConfiguration.class)
-                .setKlass(TrivialNestedClass.class)
-                .setContext(context)
+                .forClass(TrivialNestedClass.class)
+                .withContext(context)
                 .store();
 
         this.nestedWithCollectionStore = (SQLStore) DataManager
                 .config("trivialNestedClassWithCollection", SQLStoreConfiguration.class)
-                .setKlass(TrivialNestedClassWithCollection.class)
-                .setContext(context)
+                .forClass(TrivialNestedClassWithCollection.class)
+                .withContext(context)
                 .store();
     }
 
