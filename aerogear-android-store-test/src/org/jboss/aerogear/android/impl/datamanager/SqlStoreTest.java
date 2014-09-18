@@ -18,7 +18,9 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import android.content.Context;
 import android.test.RenamingDelegatingContext;
+import junit.framework.Assert;
 import org.jboss.aerogear.android.*;
+import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
@@ -74,6 +76,55 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
                 .forClass(TrivialNestedClassWithCollection.class)
                 .withContext(context)
                 .store();
+    }
+
+    public void testCreateSQLStoreWithoutKlass() {
+
+        try {
+            Store<Data> store1 = DataManager.config("store1", SQLStoreConfiguration.class)
+                    .withContext(context)
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store1.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutContext() {
+
+        try {
+            Store<Data> store2 = DataManager.config("store2", SQLStoreConfiguration.class)
+                    .forClass(Data.class)
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store2.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutContextAndKlass() {
+
+        try {
+            Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store();
+
+            Data data = new Data(10, "name", "description");
+            store3.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
     }
 
     public void testSave() throws InterruptedException {

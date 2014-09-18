@@ -52,6 +52,10 @@ public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConf
 
     @Override
     public <T> Store<T> buildStore() {
+        if((klass == null) || (context == null)) {
+            throw new IllegalStateException("Klass and Context are mandatory");
+        }
+
         return new SQLStore<T>(klass, context, builder, idGenerator);
     }
 
