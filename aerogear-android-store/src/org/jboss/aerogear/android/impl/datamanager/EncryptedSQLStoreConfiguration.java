@@ -51,13 +51,17 @@ public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<Enc
         return this;
     }
 
-    public EncryptedSQLStoreConfiguration setPassphrase(String passphrase) {
+    public EncryptedSQLStoreConfiguration usingPassphrase(String passphrase) {
         this.passphrase = passphrase;
         return this;
     }
 
     @Override
     public <T> Store<T> buildStore() {
+        if((klass == null) || (passphrase == null) || (context == null)) {
+            throw new IllegalStateException("Klass, Passphrase and Context are mandatory");
+        }
+
         return new EncryptedSQLStore<T>(klass, context, builder, idGenerator, passphrase);
     }
 
