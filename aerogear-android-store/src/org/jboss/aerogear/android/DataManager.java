@@ -72,8 +72,8 @@ public final class DataManager {
 
     }
 
-    public static Store getStore(String name) {
-        return stores.get(name);
+    public static <T> Store<T> getStore(String name) {
+        return (Store<T>) stores.get(name);
     }
 
 }
