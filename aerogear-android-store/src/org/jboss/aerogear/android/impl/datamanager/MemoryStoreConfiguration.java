@@ -16,23 +16,23 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
+import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
+import org.jboss.aerogear.android.datamanager.Store;
 
-import java.util.UUID;
+public final class MemoryStoreConfiguration extends StoreConfiguration<MemoryStoreConfiguration>
+        implements Config<MemoryStoreConfiguration> {
 
-/**
- * Id Generate using a Universally Unique Identifier (UUID).
- */
-public class DefaultIdGenerator implements IdGenerator {
+    private IdGenerator idGenerator = new DefaultIdGenerator();
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @return {@link java.util.UUID}
-     */
+    public MemoryStoreConfiguration withIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+        return this;
+    }
+
     @Override
-    public UUID generate() {
-        return UUID.randomUUID();
+    public <T> Store<T> buildStore() {
+        return new MemoryStore<T>(idGenerator);
     }
 
 }

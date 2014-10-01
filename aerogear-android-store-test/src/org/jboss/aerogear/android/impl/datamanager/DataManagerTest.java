@@ -17,118 +17,111 @@
 package org.jboss.aerogear.android.impl.datamanager;
 
 
+import org.jboss.aerogear.android.ConfigurationProvider;
 import org.jboss.aerogear.android.DataManager;
-import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.Store;
-import org.jboss.aerogear.android.datamanager.StoreFactory;
-import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.impl.helper.UnitTestUtils;
-
-import java.net.MalformedURLException;
-
-import static junit.framework.Assert.*;
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.SQL;
-import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 
 public class DataManagerTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
     public DataManagerTest() {
         super(MainActivity.class);
     }
-    private DataManager dataManager;
 
-    
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        dataManager = new DataManager();
     }
 
-    public void testConstructors() throws Exception {
-        IdGenerator defaultGenerator = new DefaultIdGenerator();
-        StoreFactory defaultFactory = new DefaultStoreFactory();
-        DataManager manager = new DataManager(defaultGenerator);
-        assertEquals(defaultGenerator, UnitTestUtils.getPrivateField(manager,
-                            "idGenerator", IdGenerator.class));
-
-        manager = new DataManager(defaultFactory);
-        assertEquals(defaultFactory, UnitTestUtils.getPrivateField(manager,
-                            "storeFactory", StoreFactory.class));
-
-        manager = new DataManager(defaultGenerator, defaultFactory);
-        assertEquals(defaultFactory, UnitTestUtils.getPrivateField(manager,
-                            "storeFactory", StoreFactory.class));
-        assertEquals(defaultGenerator, UnitTestUtils.getPrivateField(manager,
-                            "idGenerator", IdGenerator.class));
-    }
-
-    public void testRegisterStoreFactory() throws MalformedURLException {
-        @SuppressWarnings("LocalVariableHidesMemberVariable")
-        DataManager dataManager = new DataManager(new StubStoreFactory());
-
-        Store store = dataManager.store("stub store", Data.class);
+    public void testCreateStore() {
+        Store store = DataManager
+                .config("foo1", MemoryStoreConfiguration.class)
+                .store();
 
         assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", "Stub", store.getType().getName());
     }
 
-    public void testCreateStoreWithDefaultType() {
-        Store store = dataManager.store("foo", Data.class);
+    public void testGetStore() {
+        DataManager
+                .config("foo2", MemoryStoreConfiguration.class)
+                .store();
+
+        Store store = DataManager.getStore("foo2");
 
         assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    public void testCreateStoreWithMemoryType() {
-        Store store = dataManager.store("foo", new StoreConfig(Data.class));
+    public void testCreateStoreType() {
+        Store store = DataManager
+                .config("foo3", MemoryStoreConfiguration.class)
+                .store();
 
         assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", MEMORY, store.getType());
+        assertEquals("store type should be MEMORY", StoreTypes.MEMORY, store.getType());
     }
 
-    public void testAddStoreWithDefaultType() {
-        dataManager.store("foo", Data.class);
-        Store store = dataManager.get("foo");
+    public void testCreateMoreThanOneStoreInDataManager() {
+        DataManager
+                .config("foo4", MemoryStoreConfiguration.class)
+                .store();
 
-        assertNotNull("store could not be null", store);
-        assertEquals("verifying the type", MEMORY, store.getType());
+        DataManager
+                .config("foo5", MemoryStoreConfiguration.class)
+                .store();
+
+        Store store1 = DataManager.getStore("foo4");
+        Store store2 = DataManager.getStore("foo5");
+
+        assertNotNull("store could not be null", store1);
+        assertNotNull("store could not be null", store2);
     }
 
-    public void testAddStoreWithMemoryType() {
-        dataManager.store("foo", new StoreConfig(Data.class));
-        Store store = dataManager.get("foo");
+    public void testCreateDiferentStore() {
 
-        assertNotNull("foo store could not be null", store);
-        assertEquals("verifying the type", MEMORY, store.getType());
+        DataManager
+                .config("foo6", MemoryStoreConfiguration.class)
+                .store();
+
+        DataManager
+                .config("foo7", SQLStoreConfiguration.class)
+                .forClass(String.class)
+                .withContext(getActivity().getApplicationContext())
+                .store();
+
+        Store memoryStore = DataManager.getStore("foo6");
+        Store sqlStore = DataManager.getStore("foo7");
+
+        assertNotNull("store could not be null", memoryStore);
+        assertEquals("store type should be MEMORY", StoreTypes.MEMORY, memoryStore.getType());
+
+        assertNotNull("store could not be null", sqlStore);
+        assertEquals("store type should be MEMORY", StoreTypes.SQL, sqlStore.getType());
     }
 
-    public void testAddStoreWithSQLType() {
-        StoreConfig sqlStoreConfig = new StoreConfig(Data.class);
-        sqlStoreConfig.setContext(super.getActivity().getApplicationContext());
-        sqlStoreConfig.setType(SQL);
-        dataManager.store("foo", sqlStoreConfig);
-        Store store = dataManager.get("foo");
-        assertNotNull("foo store could not be null", store);
-        assertEquals("verifying the type", SQL, store.getType());
+    public void testAddNewProvider() {
+
+        DataManager.registerConfigurationProvider(StubStoreConfiguration.class, new DummyStoreConfigProvider());
+        StubStoreConfiguration config = DataManager.config("test", StubStoreConfiguration.class);
+        assertNotNull(config);
+
     }
 
-    public void testAndAddAndRemoveStores() {
-        dataManager.store("foo", new StoreConfig(Data.class));
-        dataManager.store("bar", Data.class);
+    private static final class DummyStoreConfigProvider implements ConfigurationProvider<StubStoreConfiguration> {
+        @Override
+        public StubStoreConfiguration newConfiguration() {
+            return new StubStoreConfiguration();
+        }
+    }
 
-        Store fooStore = dataManager.get("foo");
-        assertNotNull("foo store could not be null", fooStore);
+    private static class StubStoreConfiguration extends StoreConfiguration<StubStoreConfiguration> {
+        public StubStoreConfiguration() {
+        }
 
-        Store barStore = dataManager.get("bar");
-        assertNotNull("bar store could not be null", barStore);
-
-        fooStore = dataManager.remove("foo");
-        assertNotNull("foo store could not be null", fooStore);
-
-        fooStore = dataManager.get("foo");
-        assertNull("foo store should be null", fooStore);
+        @Override
+        public <T> Store<T> buildStore() {
+            return null;
+        }
     }
 
 }

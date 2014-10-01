@@ -14,25 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.aerogear.android.impl.datamanager;
+package org.jboss.aerogear.android.datamanager;
 
-import org.jboss.aerogear.android.datamanager.IdGenerator;
+import org.jboss.aerogear.android.impl.datamanager.StoreConfiguration;
 
-import java.util.UUID;
+public interface OnStoreCreatedListener {
 
-/**
- * Id Generate using a Universally Unique Identifier (UUID).
- */
-public class DefaultIdGenerator implements IdGenerator {
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @return {@link java.util.UUID}
-     */
-    @Override
-    public UUID generate() {
-        return UUID.randomUUID();
-    }
+    void onStoreCreated(StoreConfiguration<?> configuration, Store<?> store);
 
 }

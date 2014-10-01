@@ -16,38 +16,90 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import java.util.Collection;
-import static junit.framework.Assert.*;
+import junit.framework.Assert;
+import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
-import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
+import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
-import org.jboss.aerogear.android.impl.helper.DataWithNoPropertyId;
-import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
-import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
 import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 
-public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationTestCase<MainActivity> {
+import java.util.Collection;
 
+import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
 
-    private EncryptedMemoryStore<Data> store;
-    private StubIdGenerator stubIdGenerator;
+public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-    public EncryptedMemoryStorageTest() {
+    private Store<Data> store;
+
+    public EncryptedMemoryStoreTest() {
         super(MainActivity.class);
     }
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        stubIdGenerator = new StubIdGenerator();
+        StubIdGenerator stubIdGenerator = new StubIdGenerator();
         String passphrase = "Lorem Ipsum";
         Class<Data> dataModel = Data.class;
-        store = new EncryptedMemoryStore<Data>(stubIdGenerator, passphrase, dataModel);
+
+        store = DataManager
+                .config("testMemoryStore", EncryptedMemoryStoreConfiguration.class)
+                .withIdGenerator(stubIdGenerator)
+                .usingPassphrase(passphrase)
+                .forClass(dataModel)
+                .store();
     }
 
-    
+    public void testCreateSQLStoreWithoutKlass() {
+
+        try {
+            Store<Data> store1 = DataManager.config("store1", EncryptedMemoryStoreConfiguration.class)
+                    .usingPassphrase("AeroGear")
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store1.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutPassphrase() {
+
+        try {
+            Store<Data> store2 = DataManager.config("store2", EncryptedMemoryStoreConfiguration.class)
+                    .forClass(Data.class)
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store2.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutPassphraseAndKlass() {
+
+        try {
+            Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store();
+
+            Data data = new Data(10, "name", "description");
+            store3.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
     public void testStoreType() {
         assertEquals("verifying the type", ENCRYPTED_MEMORY, store.getType());
     }
@@ -96,28 +148,6 @@ public class EncryptedMemoryStorageTest  extends PatchedActivityInstrumentationT
         assertEquals(Integer.valueOf(1), data.getId());
         assertEquals("bar", data.getName());
         assertEquals("desc of bar", data.getDescription());
-    }
-
-    public void testSaveWithAnnotationNotConfigured() {
-        try {
-            MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoIdConfigured());
-        } catch (RecordIdNotFoundException ignore) {
-            return;
-        }
-        fail ("Expected RecordIdNotFoundException");
-        
-    }
-
-    
-    public void testSaveWithNoPropertyToSetId() {
-        try { 
-            MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoPropertyId());
-         } catch (PropertyNotFoundException ignore) {
-            return;
-        }
-        fail ("Expected PropertyNotFoundException");
     }
 
     public void testReset() {

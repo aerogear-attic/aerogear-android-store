@@ -16,23 +16,13 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-import org.jboss.aerogear.android.datamanager.IdGenerator;
+import org.jboss.aerogear.android.ConfigurationProvider;
 
-import java.util.UUID;
+public class SQLStoreConfigurationProvider implements ConfigurationProvider<SQLStoreConfiguration> {
 
-/**
- * Id Generate using a Universally Unique Identifier (UUID).
- */
-public class DefaultIdGenerator implements IdGenerator {
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @return {@link java.util.UUID}
-     */
     @Override
-    public UUID generate() {
-        return UUID.randomUUID();
+    public SQLStoreConfiguration newConfiguration() {
+        return new SQLStoreConfiguration();
     }
 
 }

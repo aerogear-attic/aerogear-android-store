@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.aerogear.android.datamanager;
+package org.jboss.aerogear.android.impl.datamanager;
 
-import org.jboss.aerogear.android.impl.datamanager.StoreConfig;
+import org.jboss.aerogear.android.ConfigurationProvider;
 
-public interface StoreFactory {
+public class EncryptedMemoryStoreConfigurationProvider implements ConfigurationProvider<EncryptedMemoryStoreConfiguration> {
 
-    public Store createStore(StoreConfig config);
+    @Override
+    public EncryptedMemoryStoreConfiguration newConfiguration() {
+        return new EncryptedMemoryStoreConfiguration();
+    }
 
 }

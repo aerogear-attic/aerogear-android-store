@@ -16,13 +16,14 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-
 import android.content.Context;
 import android.test.RenamingDelegatingContext;
-import org.jboss.aerogear.android.Callback;
-import org.jboss.aerogear.android.ReadFilter;
-import org.jboss.aerogear.android.RecordId;
+import junit.framework.Assert;
+import org.jboss.aerogear.android.*;
+import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
+import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,8 +33,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
-import org.jboss.aerogear.android.store.MainActivity;
 
 public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
@@ -58,9 +57,74 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
     public void setUp() throws Exception {
         super.setUp();
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
-        this.store = new SQLStore<Data>(Data.class, context);
-        this.nestedStore = new SQLStore<TrivialNestedClass>(TrivialNestedClass.class, context);
-        this.nestedWithCollectionStore = new SQLStore<TrivialNestedClassWithCollection>(TrivialNestedClassWithCollection.class, context);
+
+        this.store = (SQLStore) DataManager
+                .config("store", SQLStoreConfiguration.class)
+                .forClass(Data.class)
+                .withContext(context)
+                .store();
+
+
+        this.nestedStore = (SQLStore) DataManager
+                .config("trivialNestedClass", SQLStoreConfiguration.class)
+                .forClass(TrivialNestedClass.class)
+                .withContext(context)
+                .store();
+
+        this.nestedWithCollectionStore = (SQLStore) DataManager
+                .config("trivialNestedClassWithCollection", SQLStoreConfiguration.class)
+                .forClass(TrivialNestedClassWithCollection.class)
+                .withContext(context)
+                .store();
+    }
+
+    public void testCreateSQLStoreWithoutKlass() {
+
+        try {
+            Store<Data> store1 = DataManager.config("store1", SQLStoreConfiguration.class)
+                    .withContext(context)
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store1.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutContext() {
+
+        try {
+            Store<Data> store2 = DataManager.config("store2", SQLStoreConfiguration.class)
+                    .forClass(Data.class)
+                    .store();
+
+            Data data = new Data(10, "name", "description");
+            store2.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
+    }
+
+    public void testCreateSQLStoreWithoutContextAndKlass() {
+
+        try {
+            Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store();
+
+            Data data = new Data(10, "name", "description");
+            store3.save(data);
+
+            Assert.fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            //success
+        }
+
     }
 
     public void testSave() throws InterruptedException {
@@ -71,7 +135,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         assertEquals(data, readData);
     }
 
-    
     public void testReset() throws InterruptedException {
         saveData(10, "name", "description");
         store.reset();
@@ -79,19 +142,16 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         assertNull(readData);
     }
 
-    
     public void testIsEmpty() throws InterruptedException {
         store.openSync();
         assertTrue(store.isEmpty());
     }
 
-    
     public void testIsNotEmpty() throws InterruptedException {
         saveData(10, "name", "description");
         assertFalse(store.isEmpty());
     }
 
-    
     public void testReadAll() throws InterruptedException, JSONException {
         loadBulkData();
         List<Data> allData = new ArrayList<Data>(store.readAll());
@@ -102,7 +162,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testRemove() throws InterruptedException, JSONException {
         loadBulkData();
         store.remove(1);
@@ -115,7 +174,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -143,7 +201,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testNestedSaveAndFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -173,7 +230,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testNestedListSaveAndFilter() throws InterruptedException, JSONException {
         ReadFilter filter;
         JSONObject where;
@@ -205,7 +261,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
-    
     public void testSuccessCallback() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(2);
         store.open(new Callback<SQLStore<Data>>() {
@@ -234,7 +289,6 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         store.save(new Data(id, name, desc, enable));
     }
 
-    
     public void testSaveListOfBoringData() throws InterruptedException {
         SQLStore<ListWithId> longStore = new SQLStore<ListWithId>(ListWithId.class, context);
         longStore.openSync();
@@ -289,6 +343,7 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         public void setData(Data data) {
             this.data = data;
         }
+
     }
 
     public static final class TrivialNestedClassWithCollection {

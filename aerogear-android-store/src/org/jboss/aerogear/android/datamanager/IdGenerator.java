@@ -25,7 +25,7 @@ public interface IdGenerator {
 
     /**
      * Generate new id
-     *
+     * 
      * @return {@link java.io.Serializable}
      */
     Serializable generate();

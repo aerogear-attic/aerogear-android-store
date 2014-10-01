@@ -60,7 +60,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     private final String ID_SALT = "SALT";
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-                             IdGenerator idGenerator, String passphrase) {
+            IdGenerator idGenerator, String passphrase) {
 
         super(context, modelClass.getSimpleName(), null, 1);
 
@@ -71,9 +71,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
         this.TABLE_NAME = modelClass.getSimpleName();
     }
-    
+
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-                             IdGenerator idGenerator, String passphrase, String tableName) {
+            IdGenerator idGenerator, String passphrase, String tableName) {
 
         super(context, modelClass.getSimpleName(), null, 1);
 

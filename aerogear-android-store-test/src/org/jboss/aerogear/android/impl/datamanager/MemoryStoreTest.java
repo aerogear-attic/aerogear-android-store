@@ -16,58 +16,48 @@
  */
 package org.jboss.aerogear.android.impl.datamanager;
 
-
+import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
+import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.datamanager.StoreType;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
 import org.jboss.aerogear.android.impl.helper.DataWithNoPropertyId;
 import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
 import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
+import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.Collection;
 
 import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.MEMORY;
-import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
-import org.jboss.aerogear.android.store.MainActivity;
 
+public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
-
-    private MemoryStorage<Data> store;
+    private Store<Data> store;
     private StubIdGenerator stubIdGenerator;
 
-    public MemoryStorageTest() {
+    public MemoryStoreTest() {
         super(MainActivity.class);
     }
 
     @Override
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         super.setUp();
         stubIdGenerator = new StubIdGenerator();
-        store = new MemoryStorage<Data>(stubIdGenerator);
+        store = DataManager
+                .config("testMemoryStore", MemoryStoreConfiguration.class)
+                .withIdGenerator(stubIdGenerator)
+                .store();
     }
 
-    
     public void testStoreType() {
         assertEquals("verifying the type", MEMORY, store.getType());
     }
 
-    
-    public void testStoreTypeThrowsException() {
-        try {
-            DefaultStoreFactory factory = new DefaultStoreFactory();
-            StoreConfig config = new StoreConfig(Data.class);
-            config.setType(new FakeStoreType());
-            factory.createStore(config);
-        } catch (IllegalArgumentException ignore) {
-            return;
-        }
-        fail("Expected IllegalArgumentException");
-    }
 
-    
     public void testReadAll() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -77,7 +67,6 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertEquals("datas should 2 data", 2, datas.size());
     }
 
-    
     public void testReadWithFilter() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -87,7 +76,6 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertEquals("datas should 2 data", 2, datas.size());
     }
 
-    
     public void testReadWithFilterPerPage() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -105,7 +93,6 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertEquals("bar", datas.iterator().next().getName());
     }
 
-    
     public void testReadWithFilterWhere() throws JSONException {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -118,16 +105,14 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertNotNull("datas could not be null", datas);
         assertEquals("datas should 1 data", 1, datas.size());
         assertEquals("bar", datas.iterator().next().getName());
-
     }
 
-    
     public void testReadWithFilterThrowsExceptionWithNestingJSON() throws JSONException {
         try {
-        ReadFilter filter = new ReadFilter();
-        filter.setWhere(new JSONObject("{\"name\":{\"name\":\"bar\"}}"));
+            ReadFilter filter = new ReadFilter();
+            filter.setWhere(new JSONObject("{\"name\":{\"name\":\"bar\"}}"));
 
-        Collection<Data> datas = store.readWithFilter(filter);
+            Collection<Data> datas = store.readWithFilter(filter);
         } catch (IllegalArgumentException ignore) {
             return;
         }
@@ -140,14 +125,12 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertNotNull("data could not be null", data);
     }
 
-    
     public void testSaveNoExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
         assertEquals(Integer.valueOf(1), data.getId());
     }
 
-    
     public void testSaveExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
@@ -163,29 +146,26 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertEquals("desc of bar", data.getDescription());
     }
 
-    
     public void testSaveWithAnnotationNotConfigured() {
         try {
-            MemoryStorage<DataWithNoIdConfigured> memoryStorage = new MemoryStorage<DataWithNoIdConfigured>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoIdConfigured());
+            MemoryStore<DataWithNoIdConfigured> memoryStore = new MemoryStore<DataWithNoIdConfigured>(stubIdGenerator);
+            memoryStore.save(new DataWithNoIdConfigured());
         } catch (RecordIdNotFoundException ignore) {
             return;
         }
         fail("Expected RecordIdNotFoundException");
     }
 
-    
     public void testSaveWithNoPropertyToSetId() {
         try {
-            MemoryStorage<DataWithNoPropertyId> memoryStorage = new MemoryStorage<DataWithNoPropertyId>(stubIdGenerator);
-            memoryStorage.save(new DataWithNoPropertyId());
+            MemoryStore<DataWithNoPropertyId> memoryStore = new MemoryStore<DataWithNoPropertyId>(stubIdGenerator);
+            memoryStore.save(new DataWithNoPropertyId());
         } catch (PropertyNotFoundException ignore) {
             return;
         }
         fail("Expected PropertyNotFoundException");
     }
 
-    
     public void testReset() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -205,7 +185,6 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertNull("bar should be null", bar);
     }
 
-    
     public void testRemove() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -225,19 +204,17 @@ public class MemoryStorageTest extends PatchedActivityInstrumentationTestCase<Ma
         assertNull("bar should be null", bar);
     }
 
-    
     public void testIsEmpty() {
         assertTrue("should be empty", store.isEmpty());
     }
 
-    
+
     public void testIsNotEmpty() {
         store.save(new Data("foo", "desc of foo"));
         assertFalse("should not be empty", store.isEmpty());
     }
 
     private static class FakeStoreType implements StoreType {
-
         @Override
         public String getName() {
             return "FAKE";

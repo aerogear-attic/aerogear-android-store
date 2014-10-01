@@ -30,12 +30,12 @@ import java.util.*;
 /**
  * Memory implementation of Store {@link Store}.
  */
-public class MemoryStorage<T> implements Store<T> {
+public class MemoryStore<T> implements Store<T> {
 
     private final Map<Serializable, T> data = new HashMap<Serializable, T>();
     private final IdGenerator idGenerator;
 
-    public MemoryStorage(IdGenerator idGenerator) {
+    public MemoryStore(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
     }
 
