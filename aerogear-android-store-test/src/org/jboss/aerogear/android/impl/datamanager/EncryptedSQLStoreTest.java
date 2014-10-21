@@ -118,60 +118,60 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
 
     }
 
-//    public void testReadAll() {
-//        for (int i = 1; i <= 10; i++) {
-//            Data data = new Data(i, "name " + i, "description " + i);
-//            store.save(data);
-//        }
-//
-//        assertEquals("Store should have 10 elements", 10, store.readAll().size());
-//    }
-//
-//    public void testRead() {
-//        Data data = new Data(10, "name", "description");
-//        store.save(data);
-//
-//        Data readData = store.read(10);
-//        assertEquals(data, readData);
-//        assertTrue("Store can not be empty", !store.isEmpty());
-//    }
-//
-//    public void testSave() {
-//        Data data = new Data(10, "name", "description");
-//        store.save(data);
-//
-//        assertFalse("Store can not be empty", store.isEmpty());
-//        assertEquals("Store should have 1 elements", 1, store.readAll().size());
-//    }
-//
-//    public void testReset() {
-//        Data data = new Data(10, "name", "description");
-//        store.save(data);
-//        store.reset();
-//
-//        assertTrue("Store can empty", !store.isEmpty());
-//    }
-//
-//    public void testRemove() {
-//        for (int i = 1; i <= 10; i++) {
-//            Data data = new Data(i, "name " + i, "description " + i);
-//            store.save(data);
-//        }
-//
-//        store.remove(1);
-//
-//        assertEquals("Store should have 9 elements", 9, store.readAll().size());
-//    }
-//
-//    public void testIsEmpty() {
-//        assertTrue("Store can empty", store.isEmpty());
-//    }
-//
-//    public void testIsNotEmpty() {
-//        Data data = new Data(10, "name", "description");
-//        store.save(data);
-//
-//        assertFalse("Store can not be empty", store.isEmpty());
-//    }
+    public void testReadAll() {
+        for (int i = 1; i <= 10; i++) {
+            Data data = new Data(i, "name " + i, "description " + i);
+            store.save(data);
+        }
+
+        assertEquals("Store should have 10 elements", 10, store.readAll().size());
+    }
+
+    public void testRead() {
+        Data data = new Data(10, "name", "description");
+        store.save(data);
+
+        Data readData = store.read(10);
+        assertEquals(data, readData);
+        assertTrue("Store can not be empty", !store.isEmpty());
+    }
+
+    public void testSave() {
+        Data data = new Data(10, "name", "description");
+        store.save(data);
+
+        assertFalse("Store can not be empty", store.isEmpty());
+        assertEquals("Store should have 1 elements", 1, store.readAll().size());
+    }
+
+    public void testReset() {
+        Data data = new Data(10, "name", "description");
+        store.save(data);
+        store.reset();
+
+        assertTrue("Store can empty", store.isEmpty());
+    }
+
+    public void testRemove() {
+        for (int i = 1; i <= 10; i++) {
+            Data data = new Data(i, "name " + i, "description " + i);
+            store.save(data);
+        }
+
+        store.remove(1);
+
+        assertEquals("Store should have 9 elements", 9, store.readAll().size());
+    }
+
+    public void testIsEmpty() {
+        assertTrue("Store can empty", store.isEmpty());
+    }
+
+    public void testIsNotEmpty() {
+        Data data = new Data(10, "name", "description");
+        store.save(data);
+
+        assertFalse("Store can not be empty", store.isEmpty());
+    }
 
 }
