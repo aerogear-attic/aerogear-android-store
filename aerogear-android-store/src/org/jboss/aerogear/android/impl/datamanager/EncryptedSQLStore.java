@@ -83,6 +83,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         this.passphrase = passphrase;
 
         this.TABLE_NAME = tableName;
+
+        getReadableDatabase().isOpen(); // Force open database on create this
     }
 
     private String getEncryptTableHelperName() {
