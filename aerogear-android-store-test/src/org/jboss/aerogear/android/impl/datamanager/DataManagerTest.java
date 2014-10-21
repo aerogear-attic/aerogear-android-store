@@ -21,7 +21,7 @@ import org.jboss.aerogear.android.ConfigurationProvider;
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.store.MainActivity;
-import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
 
 public class DataManagerTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 

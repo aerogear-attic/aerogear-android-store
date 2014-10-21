@@ -23,7 +23,7 @@ import org.jboss.aerogear.android.*;
 import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.store.MainActivity;
-import org.jboss.aerogear.android.store.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
