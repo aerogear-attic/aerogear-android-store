@@ -42,13 +42,14 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
         return this;
     }
 
+
     @Override
-    public <T> Store<T> buildStore() {
+    protected Store buildStore() {
         if((klass == null) || (passphrase == null)) {
             throw new IllegalStateException("Klass and Passphrase are mandatory");
         }
 
-        return new EncryptedMemoryStore<T>(idGenerator, passphrase, klass);
+        return new EncryptedMemoryStore(idGenerator, passphrase, klass);
     }
 
 }

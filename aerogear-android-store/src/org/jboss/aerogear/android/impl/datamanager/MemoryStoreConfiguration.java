@@ -18,7 +18,6 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import org.jboss.aerogear.android.Config;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
-import org.jboss.aerogear.android.datamanager.Store;
 
 public final class MemoryStoreConfiguration extends StoreConfiguration<MemoryStoreConfiguration>
         implements Config<MemoryStoreConfiguration> {
@@ -31,8 +30,8 @@ public final class MemoryStoreConfiguration extends StoreConfiguration<MemorySto
     }
 
     @Override
-    public <T> Store<T> buildStore() {
-        return new MemoryStore<T>(idGenerator);
+    protected MemoryStore buildStore() {
+        return new MemoryStore(idGenerator);
     }
 
 }
