@@ -3,6 +3,11 @@ language: android
 notifications:
   irc: "irc.freenode.org#aerogear"
 
+jdk:
+   - oraclejdk8
+   - oraclejdk7
+   - openjdk6
+
 android:
   components:
     - build-tools-19.1.0
@@ -12,7 +17,7 @@ android:
 
 env:
     matrix:
-      - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a MAVEN_OPTS=-Xmx1024m
+      - ANDROID_SDKS=android-19 ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
 
 before_install:
 
@@ -45,7 +50,7 @@ before_install:
   # AeroGear Android Core
   - git clone git://github.com/aerogear/aerogear-android-core.git
   - cd $PWD/aerogear-android-core
-  - mvn install -fn --quiet
+  - mvn install -N --quiet
   - cd -
 
   # AeroGear Android Security
