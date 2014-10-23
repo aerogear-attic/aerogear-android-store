@@ -298,7 +298,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     public void openSync() {
-        EncryptedSQLStore.this.database = getWritableDatabase();
+        this.database = getWritableDatabase();
     }
 
     @Override

@@ -330,7 +330,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     public void openSync() {
-        SQLStore.this.database = getWritableDatabase();
+        this.database = getWritableDatabase();
     }
 
     @Override
