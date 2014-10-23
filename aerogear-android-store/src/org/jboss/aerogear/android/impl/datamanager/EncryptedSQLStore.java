@@ -21,8 +21,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
+import android.util.Log;
 import com.google.gson.GsonBuilder;
 import org.jboss.aerogear.AeroGearCrypto;
+import org.jboss.aerogear.android.Callback;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.IdGenerator;
 import org.jboss.aerogear.android.datamanager.Store;
@@ -43,6 +46,8 @@ import java.util.List;
 
 public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
+    private static final String TAG = EncryptedSQLStore.class.getSimpleName();
+
     private final Class<T> modelClass;
     private final GsonBuilder builder;
     private final IdGenerator idGenerator;
@@ -58,14 +63,15 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private final String ID_IV = "IV";
     private final String ID_SALT = "SALT";
+    private SQLiteDatabase database;
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-            IdGenerator idGenerator, String passphrase) {
+                             IdGenerator idGenerator, String passphrase) {
         this(modelClass, context, builder, idGenerator, passphrase, modelClass.getSimpleName());
     }
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-            IdGenerator idGenerator, String passphrase, String tableName) {
+                             IdGenerator idGenerator, String passphrase, String tableName) {
 
         super(context, modelClass.getSimpleName(), null, 1);
 
@@ -75,8 +81,6 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         this.passphrase = passphrase;
 
         this.TABLE_NAME = tableName;
-
-        getReadableDatabase().isOpen(); // Force open database on create this
     }
 
     private String getEncryptTableHelperName() {
@@ -99,12 +103,12 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         String SQL_STORE_IV = "INSERT INTO " + getEncryptTableHelperName() +
                 " ( " + COLUMN_ID + ", " + COLUMN_DATA + " ) " +
                 " VALUES ( ?, ? ) ";
-        sqLiteDatabase.execSQL(SQL_STORE_IV, new Object[] { ID_IV, iv });
+        sqLiteDatabase.execSQL(SQL_STORE_IV, new Object[]{ID_IV, iv});
 
         String SQL_STORE_SALT = "INSERT INTO " + getEncryptTableHelperName() +
                 " ( " + COLUMN_ID + ", " + COLUMN_DATA + " ) " +
                 " VALUES ( ?, ? ) ";
-        sqLiteDatabase.execSQL(SQL_STORE_SALT, new Object[] { ID_SALT, salt });
+        sqLiteDatabase.execSQL(SQL_STORE_SALT, new Object[]{ID_SALT, salt});
 
         String SQL_CREATE_ENTITY_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
                 " ( " +
@@ -127,7 +131,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
         String SQL = "SELECT " + COLUMN_DATA + " FROM " + getEncryptTableHelperName() + " WHERE " + COLUMN_ID + " = ?";
 
-        Cursor cursorIV = db.rawQuery(SQL, new String[] { ID_IV });
+        Cursor cursorIV = db.rawQuery(SQL, new String[]{ID_IV});
         cursorIV.moveToFirst();
 
         try {
@@ -136,7 +140,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             cursorIV.close();
         }
 
-        Cursor cursorSalt = db.rawQuery(SQL, new String[] { ID_SALT });
+        Cursor cursorSalt = db.rawQuery(SQL, new String[]{ID_SALT});
         cursorSalt.moveToFirst();
 
         try {
@@ -192,7 +196,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     @Override
     public T read(Serializable id) throws InvalidKeyException {
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
-        Cursor cursor = getReadableDatabase().rawQuery(sql, new String[] { id.toString() });
+        Cursor cursor = getReadableDatabase().rawQuery(sql, new String[]{id.toString()});
         cursor.moveToFirst();
 
         if (cursor.getCount() == 0) {
@@ -233,7 +237,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         values.put(COLUMN_ID, idValue.toString());
         values.put(COLUMN_DATA, cryptoUtils.encrypt(item));
 
-        getWritableDatabase().insert(TABLE_NAME, null, values);
+        this.database.insert(TABLE_NAME, null, values);
     }
 
     /**
@@ -242,7 +246,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     @Override
     public void reset() {
         String sql = String.format("DELETE FROM " + TABLE_NAME);
-        getWritableDatabase().execSQL(sql);
+        this.database.execSQL(sql);
     }
 
     /**
@@ -251,7 +255,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     @Override
     public void remove(Serializable id) {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
-        getWritableDatabase().execSQL(sql, new Object[] { id });
+        this.database.execSQL(sql, new Object[]{id});
     }
 
     /**
@@ -265,6 +269,41 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         boolean result = (cursor.getInt(0) == 0);
         cursor.close();
         return result;
+    }
+
+    public void open(final Callback<EncryptedSQLStore<T>> onReady) {
+        new AsyncTask<Void, Void, Void>() {
+            private Exception exception;
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    EncryptedSQLStore.this.database = getWritableDatabase();
+                } catch (Exception e) {
+                    this.exception = e;
+                    Log.e(TAG, "There was an error loading the database", e);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                if (exception != null) {
+                    onReady.onFailure(exception);
+                } else {
+                    onReady.onSuccess(EncryptedSQLStore.this);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void[]) null);
+    }
+
+    public void openSync() {
+        EncryptedSQLStore.this.database = getWritableDatabase();
+    }
+
+    @Override
+    public void close() {
+        this.database.close();
     }
 
 }

@@ -20,10 +20,9 @@ import android.content.Context;
 import android.test.RenamingDelegatingContext;
 import junit.framework.Assert;
 import org.jboss.aerogear.android.DataManager;
-import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.store.MainActivity;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.store.MainActivity;
 
 import java.util.UUID;
 
@@ -34,28 +33,33 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     }
 
     private Context context;
-    private Store<Data> store;
+    private EncryptedSQLStore<Data> store;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
 
-        store = DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
+        store = (EncryptedSQLStore<Data>) DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
                 .usingPassphrase("AeroGear")
                 .forClass(Data.class)
                 .store();
+
+        store.openSync();
 
     }
 
     public void testCreateSQLStoreWithoutKlass() {
 
         try {
-            Store<Data> store1 = DataManager.config("store1", EncryptedSQLStoreConfiguration.class)
+            EncryptedSQLStore<Data> store1 = (EncryptedSQLStore<Data>)
+                    DataManager.config("store1", EncryptedSQLStoreConfiguration.class)
                     .withContext(context)
                     .usingPassphrase("AeroGear")
                     .store();
+            store1.openSync();
+
 
             Data data = new Data(10, "name", "description");
             store1.save(data);
@@ -70,10 +74,12 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     public void testCreateSQLStoreWithoutContext() {
 
         try {
-            Store<Data> store2 = DataManager.config("store2", EncryptedSQLStoreConfiguration.class)
+            EncryptedSQLStore<Data> store2 = (EncryptedSQLStore<Data>)
+                    DataManager.config("store2", EncryptedSQLStoreConfiguration.class)
                     .forClass(Data.class)
                     .usingPassphrase("AeroGear")
                     .store();
+            store2.openSync();
 
             Data data = new Data(10, "name", "description");
             store2.save(data);
@@ -88,10 +94,12 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     public void testCreateSQLStoreWithoutPassphrase() {
 
         try {
-            Store<Data> store3 = DataManager.config("store3", EncryptedSQLStoreConfiguration.class)
+            EncryptedSQLStore<Data> store3 = (EncryptedSQLStore<Data>)
+                    DataManager.config("store3", EncryptedSQLStoreConfiguration.class)
                     .withContext(context)
                     .forClass(String.class)
                     .store();
+            store3.openSync();
 
             Data data = new Data(10, "name", "description");
             store3.save(data);
@@ -106,7 +114,9 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     public void testCreateSQLStoreWithoutContextAndKlassAndPassphrase() {
 
         try {
-            Store<Data> store4 = DataManager.config("store3", EncryptedSQLStoreConfiguration.class).store();
+            EncryptedSQLStore<Data> store4 = (EncryptedSQLStore<Data>)
+                    DataManager.config("store3", EncryptedSQLStoreConfiguration.class).store();
+            store4.openSync();
 
             Data data = new Data(10, "name", "description");
             store4.save(data);
