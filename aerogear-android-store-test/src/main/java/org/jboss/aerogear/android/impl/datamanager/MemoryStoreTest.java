@@ -25,7 +25,7 @@ import org.jboss.aerogear.android.impl.helper.DataWithNoIdConfigured;
 import org.jboss.aerogear.android.impl.helper.DataWithNoPropertyId;
 import org.jboss.aerogear.android.impl.reflection.PropertyNotFoundException;
 import org.jboss.aerogear.android.impl.reflection.RecordIdNotFoundException;
-import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.test.MainActivity;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
