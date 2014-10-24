@@ -86,7 +86,17 @@
 
         </dependencies>
     </dependencyManagement>
+   
+    <dependencies>
 
+        <!-- Project dependencies -->
+        <dependency>
+            <groupId>android</groupId>
+            <artifactId>android</artifactId>
+            <scope>provided</scope>
+        </dependency>
+   </dependencies>
+   
     <build>
         <pluginManagement>
             <plugins>
