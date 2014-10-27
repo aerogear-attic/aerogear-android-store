@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.jboss.aerogear.android.store">
+          package="org.jboss.aerogear.android.store.test">
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>
 
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <instrumentation
             android:name="android.test.InstrumentationTestRunner"
-            android:targetPackage="org.jboss.aerogear.android.store"/>
+            android:targetPackage="org.jboss.aerogear.android.store.test"/>
 
     <application
             android:icon="@drawable/ic_launcher"
@@ -15,7 +15,7 @@
         <uses-library android:name="android.test.runner"/>
 
         <activity
-                android:name="org.jboss.aerogear.android.store.MainActivity"
+                android:name="org.jboss.aerogear.android.store.test.MainActivity"
                 android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

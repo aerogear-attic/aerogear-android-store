@@ -21,7 +21,7 @@ import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.test.MainActivity;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
 
 import java.util.Collection;

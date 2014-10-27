@@ -22,7 +22,7 @@ import junit.framework.Assert;
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
-import org.jboss.aerogear.android.store.MainActivity;
+import org.jboss.aerogear.android.store.test.MainActivity;
 
 import java.util.UUID;
 
