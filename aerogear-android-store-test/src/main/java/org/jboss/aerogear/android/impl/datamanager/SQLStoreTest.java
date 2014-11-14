@@ -364,6 +364,16 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         }
     }
 
+    public void testIsEmptyWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.isEmpty();
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
     private void loadBulkData() throws InterruptedException {
         saveData(1, "name", "description");
         saveData(2, "name", "description");

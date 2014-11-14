@@ -293,9 +293,15 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty() throws StoreNotOpenException {
+        if (!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = String.format("Select count(_ID) from %s_property", className);
         Cursor cursor = database.rawQuery(sql, null);
         cursor.moveToFirst();
