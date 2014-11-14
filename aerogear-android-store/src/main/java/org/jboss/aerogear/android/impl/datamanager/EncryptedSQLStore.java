@@ -170,10 +170,13 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidKeyException
+     * @throws StoreNotOpenException
      */
     @Override
-    public Collection<T> readAll() throws InvalidKeyException {
-        if(!isOpen()) {
+    public Collection<T> readAll() throws InvalidKeyException, StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -196,10 +199,13 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidKeyException
+     * @throws StoreNotOpenException
      */
     @Override
-    public T read(Serializable id) throws InvalidKeyException {
-        if(!isOpen()) {
+    public T read(Serializable id) throws InvalidKeyException, StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -223,16 +229,18 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      * {@inheritDoc}
      */
     @Override
-    public List<T> readWithFilter(ReadFilter filter) throws InvalidKeyException {
+    public List<T> readWithFilter(ReadFilter filter) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public void save(T item) {
-        if(!isOpen()) {
+    public void save(T item) throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -254,10 +262,12 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public void reset() {
-        if(!isOpen()) {
+    public void reset() throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -267,10 +277,12 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public void remove(Serializable id) {
-        if(!isOpen()) {
+    public void remove(Serializable id) throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 

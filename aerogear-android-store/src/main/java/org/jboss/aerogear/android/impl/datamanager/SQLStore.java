@@ -82,7 +82,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public StoreType getType() {
@@ -90,11 +90,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public Collection<T> readAll() {
-        if(!isOpen()) {
+    public Collection<T> readAll() throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -124,11 +126,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public T read(Serializable id) {
-        if(!isOpen()) {
+    public T read(Serializable id) throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -156,10 +160,12 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public List<T> readWithFilter(ReadFilter filter) {
-        if(!isOpen()) {
+    public List<T> readWithFilter(ReadFilter filter) throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -176,7 +182,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             return new ArrayList<T>(readAll());
         } else {
             for (Pair<String, String> kv : queryList) {
-                String[] bindArgs = new String[] { kv.first, kv.second };
+                String[] bindArgs = new String[]{kv.first, kv.second};
                 Cursor cursor = database.rawQuery(sql, bindArgs);
                 while (cursor.moveToNext()) {
                     String id = cursor.getString(0);
@@ -202,11 +208,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public void save(T item) {
-        if(!isOpen()) {
+    public void save(T item) throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -253,13 +261,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             JsonPrimitive primitive = serialized.getAsJsonPrimitive();
             if (primitive.isBoolean()) {
                 String value = primitive.getAsBoolean() ? "true" : "false";
-                database.execSQL(sql, new Object[] { path, value, id });
+                database.execSQL(sql, new Object[]{path, value, id});
             } else if (primitive.isNumber()) {
                 Number value = primitive.getAsNumber();
-                database.execSQL(sql, new Object[] { path, value, id });
+                database.execSQL(sql, new Object[]{path, value, id});
             } else if (primitive.isString()) {
                 String value = primitive.getAsString();
-                database.execSQL(sql, new Object[] { path, value, id });
+                database.execSQL(sql, new Object[]{path, value, id});
             } else {
                 throw new IllegalArgumentException(serialized + " isn't a number, boolean, or string");
             }
@@ -269,11 +277,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public void reset() {
-        if(!isOpen()) {
+    public void reset() throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -282,7 +292,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public boolean isEmpty() {
@@ -295,11 +305,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException
      */
     @Override
-    public void remove(Serializable id) {
-        if(!isOpen()) {
+    public void remove(Serializable id) throws StoreNotOpenException {
+        if (!isOpen()) {
             throw new StoreNotOpenException();
         }
 
@@ -307,11 +319,10 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         Object[] bindArgs = new Object[1];
         bindArgs[0] = id;
         database.execSQL(sql, bindArgs);
-
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
