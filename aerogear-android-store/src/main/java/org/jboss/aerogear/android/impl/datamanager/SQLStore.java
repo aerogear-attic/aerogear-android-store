@@ -444,7 +444,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     private boolean isOpen() {
-        return database != null;
+        return this.database != null;
     }
 
 }
