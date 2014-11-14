@@ -304,6 +304,60 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
+    public void testReadAllWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.readAll();
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testReadWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.read(Long.valueOf("1"));
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testReadWithFilterWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.readWithFilter(new ReadFilter());
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testSaveWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.save(new Data("AeroGear", "The best framework for mobile development."));
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testRemoveWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.remove(Long.valueOf("1"));
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testResetWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.reset();
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
     private void loadBulkData() throws InterruptedException {
         saveData(1, "name", "description");
         saveData(2, "name", "description");
