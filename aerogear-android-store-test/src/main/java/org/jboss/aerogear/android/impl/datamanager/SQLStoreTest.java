@@ -308,6 +308,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.readAll();
+            Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
         }
@@ -317,6 +318,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.read(Long.valueOf("1"));
+            Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
         }
@@ -326,6 +328,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.readWithFilter(new ReadFilter());
+            Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
         }
@@ -335,6 +338,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.save(new Data("AeroGear", "The best framework for mobile development."));
+            Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
         }
@@ -344,6 +348,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.remove(Long.valueOf("1"));
+            Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
         }
@@ -353,6 +358,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.reset();
+            Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
         }
