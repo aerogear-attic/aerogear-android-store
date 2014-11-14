@@ -92,7 +92,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public Collection<T> readAll() throws StoreNotOpenException {
@@ -128,7 +128,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public T read(Serializable id) throws StoreNotOpenException {
@@ -161,7 +161,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public List<T> readWithFilter(ReadFilter filter) throws StoreNotOpenException {
@@ -210,7 +210,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public void save(T item) throws StoreNotOpenException {
@@ -279,7 +279,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public void reset() throws StoreNotOpenException {
@@ -294,7 +294,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public boolean isEmpty() throws StoreNotOpenException {
@@ -313,7 +313,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public void remove(Serializable id) throws StoreNotOpenException {
