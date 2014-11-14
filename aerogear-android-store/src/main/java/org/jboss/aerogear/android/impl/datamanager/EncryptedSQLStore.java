@@ -171,8 +171,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws InvalidKeyException
-     * @throws StoreNotOpenException
+     * @throws InvalidKeyException Will occur if you use the wrong passphrase to retrieve the data
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException, StoreNotOpenException {
@@ -200,8 +200,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws InvalidKeyException
-     * @throws StoreNotOpenException
+     * @throws InvalidKeyException Will occur if you use the wrong passphrase to retrieve the data
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public T read(Serializable id) throws InvalidKeyException, StoreNotOpenException {
@@ -236,7 +236,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public void save(T item) throws StoreNotOpenException {
@@ -263,7 +263,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public void reset() throws StoreNotOpenException {
@@ -278,7 +278,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public void remove(Serializable id) throws StoreNotOpenException {
@@ -293,7 +293,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException*
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database 
      */
     @Override
     public boolean isEmpty() throws StoreNotOpenException {
