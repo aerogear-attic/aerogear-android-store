@@ -94,6 +94,10 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public Collection<T> readAll() {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE,PARENT_ID from %s_property", className);
         Cursor cursor = database.rawQuery(sql, new String[0]);
         HashMap<String, JsonObject> objects = new HashMap<String, JsonObject>(cursor.getCount());
@@ -124,6 +128,10 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public T read(Serializable id) {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE from %s_property where PARENT_ID = ?", className);
         String[] bindArgs = new String[1];
         bindArgs[0] = id.toString();
@@ -147,10 +155,14 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public List<T> readWithFilter(ReadFilter filter) {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         if (filter == null) {
             filter = new ReadFilter();
         }
@@ -194,6 +206,10 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void save(T item) {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
         Serializable idValue = (Serializable) property.getValue(item);
@@ -257,6 +273,10 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void reset() {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = String.format("Delete from %s_property", className);
         database.execSQL(sql);
     }
@@ -279,6 +299,10 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void remove(Serializable id) {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = String.format("Delete from %s_property where PARENT_ID = ?", className);
         Object[] bindArgs = new Object[1];
         bindArgs[0] = id;
@@ -418,4 +442,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             }
         }
     }
+
+    private boolean isOpen() {
+        return database != null;
+    }
+
 }
