@@ -34,9 +34,9 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
+public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-    public SqlStoreTest() {
+    public SQLStoreTest() {
         super(MainActivity.class);
     }
 
