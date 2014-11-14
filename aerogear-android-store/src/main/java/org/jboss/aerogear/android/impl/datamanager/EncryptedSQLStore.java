@@ -292,9 +292,15 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException*
      */
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty() throws StoreNotOpenException {
+        if (!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = "SELECT COUNT(" + COLUMN_ID + ") FROM " + TABLE_NAME;
         Cursor cursor = getReadableDatabase().rawQuery(sql, null);
         cursor.moveToFirst();

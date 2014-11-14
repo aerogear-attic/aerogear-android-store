@@ -239,4 +239,15 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
         }
     }
 
+    public void testIsEmptyWithClosedStore() {
+        try {
+            EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            closedStore.isEmpty();
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
 }
