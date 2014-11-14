@@ -18,6 +18,7 @@ package org.jboss.aerogear.android.impl.datamanager;
 
 import android.content.Context;
 import android.test.RenamingDelegatingContext;
+import com.google.gson.GsonBuilder;
 import junit.framework.Assert;
 import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.impl.helper.Data;
@@ -47,7 +48,6 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
                 .store();
 
         store.openSync();
-
     }
 
     public void testCreateSQLStoreWithoutKlass() {
@@ -182,6 +182,56 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
         store.save(data);
 
         assertFalse("Store can not be empty", store.isEmpty());
+    }
+
+    public void testReadAllWithClosedStore() {
+        try {
+            EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            closedStore.readAll();
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testReadWithClosedStore() {
+        try {
+            EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            store.read(Long.valueOf("1"));
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testSaveWithClosedStore() {
+        try {
+            EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            store.save(new Data("AeroGear", "The best framework for mobile development."));
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testRemoveWithClosedStore() {
+        try {
+            EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            store.remove(Long.valueOf("1"));
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testResetWithClosedStore() {
+        try {
+            EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            store.reset();
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
     }
 
 }

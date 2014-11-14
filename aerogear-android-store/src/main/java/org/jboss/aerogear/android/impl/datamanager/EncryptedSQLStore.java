@@ -173,6 +173,10 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         ArrayList<T> dataList = new ArrayList<T>();
 
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME;
@@ -195,6 +199,10 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public T read(Serializable id) throws InvalidKeyException {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
         Cursor cursor = getReadableDatabase().rawQuery(sql, new String[]{id.toString()});
         cursor.moveToFirst();
@@ -224,6 +232,10 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void save(T item) {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
         Serializable idValue = (Serializable) property.getValue(item);
@@ -245,6 +257,10 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void reset() {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = String.format("DELETE FROM " + TABLE_NAME);
         this.database.execSQL(sql);
     }
@@ -254,6 +270,10 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void remove(Serializable id) {
+        if(!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
         this.database.execSQL(sql, new Object[]{id});
     }
@@ -304,6 +324,10 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     @Override
     public void close() {
         this.database.close();
+    }
+
+    private boolean isOpen() {
+        return this.database != null;
     }
 
 }
