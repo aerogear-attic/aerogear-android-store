@@ -96,9 +96,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public Collection<T> readAll() throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE,PARENT_ID from %s_property", className);
         Cursor cursor = database.rawQuery(sql, new String[0]);
@@ -132,9 +130,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public T read(Serializable id) throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE from %s_property where PARENT_ID = ?", className);
         String[] bindArgs = new String[1];
@@ -165,9 +161,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public List<T> readWithFilter(ReadFilter filter) throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         if (filter == null) {
             filter = new ReadFilter();
@@ -214,9 +208,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void save(T item) throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
@@ -283,9 +275,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void reset() throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = String.format("Delete from %s_property", className);
         database.execSQL(sql);
@@ -298,9 +288,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public boolean isEmpty() throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = String.format("Select count(_ID) from %s_property", className);
         Cursor cursor = database.rawQuery(sql, null);
@@ -317,9 +305,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void remove(Serializable id) throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = String.format("Delete from %s_property where PARENT_ID = ?", className);
         Object[] bindArgs = new Object[1];
@@ -332,7 +318,6 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         db.execSQL(String.format(CREATE_PROPERTIES_TABLE, className));
         db.execSQL(String.format(CREATE_PROPERTIES_INDEXES, className, className, className, className, className, className));
     }
@@ -462,6 +447,12 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private boolean isOpen() {
         return this.database != null;
+    }
+
+    private void ensureOpen() {
+        if (!isOpen()) {
+            throw new StoreNotOpenException();
+        }
     }
 
 }
