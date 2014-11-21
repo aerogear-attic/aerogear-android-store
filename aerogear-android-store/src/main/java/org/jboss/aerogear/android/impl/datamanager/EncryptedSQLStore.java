@@ -176,9 +176,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException, StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         ArrayList<T> dataList = new ArrayList<T>();
 
@@ -205,9 +203,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public T read(Serializable id) throws InvalidKeyException, StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
         Cursor cursor = getReadableDatabase().rawQuery(sql, new String[]{id.toString()});
@@ -240,9 +236,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void save(T item) throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
@@ -267,9 +261,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void reset() throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = String.format("DELETE FROM " + TABLE_NAME);
         this.database.execSQL(sql);
@@ -282,9 +274,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public void remove(Serializable id) throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
         this.database.execSQL(sql, new Object[]{id});
@@ -297,9 +287,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      */
     @Override
     public boolean isEmpty() throws StoreNotOpenException {
-        if (!isOpen()) {
-            throw new StoreNotOpenException();
-        }
+        ensureOpen();
 
         String sql = "SELECT COUNT(" + COLUMN_ID + ") FROM " + TABLE_NAME;
         Cursor cursor = getReadableDatabase().rawQuery(sql, null);
@@ -346,6 +334,12 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private boolean isOpen() {
         return this.database != null;
+    }
+
+    private void ensureOpen() {
+        if (!isOpen()) {
+            throw new StoreNotOpenException();
+        }
     }
 
 }
