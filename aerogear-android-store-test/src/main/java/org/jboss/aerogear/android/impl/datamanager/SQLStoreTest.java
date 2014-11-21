@@ -34,9 +34,9 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
+public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
 
-    public SqlStoreTest() {
+    public SQLStoreTest() {
         super(MainActivity.class);
     }
 
@@ -302,6 +302,76 @@ public class SqlStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         longStore.save(longList);
         assertEquals(100, longStore.readAll().iterator().next().data.size());
 
+    }
+
+    public void testReadAllWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.readAll();
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testReadWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.read(Long.valueOf("1"));
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testReadWithFilterWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.readWithFilter(new ReadFilter());
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testSaveWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.save(new Data("AeroGear", "The best framework for mobile development."));
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testRemoveWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.remove(Long.valueOf("1"));
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testResetWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.reset();
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testIsEmptyWithClosedStore() {
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.isEmpty();
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
     }
 
     private void loadBulkData() throws InterruptedException {

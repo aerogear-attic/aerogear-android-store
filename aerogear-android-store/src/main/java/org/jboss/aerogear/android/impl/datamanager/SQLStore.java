@@ -82,7 +82,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public StoreType getType() {
@@ -90,10 +90,14 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public Collection<T> readAll() {
+    public Collection<T> readAll() throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE,PARENT_ID from %s_property", className);
         Cursor cursor = database.rawQuery(sql, new String[0]);
         HashMap<String, JsonObject> objects = new HashMap<String, JsonObject>(cursor.getCount());
@@ -120,10 +124,14 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public T read(Serializable id) {
+    public T read(Serializable id) throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE from %s_property where PARENT_ID = ?", className);
         String[] bindArgs = new String[1];
         bindArgs[0] = id.toString();
@@ -147,10 +155,14 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public List<T> readWithFilter(ReadFilter filter) {
+    public List<T> readWithFilter(ReadFilter filter) throws StoreNotOpenException {
+        ensureOpen();
+
         if (filter == null) {
             filter = new ReadFilter();
         }
@@ -164,7 +176,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             return new ArrayList<T>(readAll());
         } else {
             for (Pair<String, String> kv : queryList) {
-                String[] bindArgs = new String[] { kv.first, kv.second };
+                String[] bindArgs = new String[]{kv.first, kv.second};
                 Cursor cursor = database.rawQuery(sql, bindArgs);
                 while (cursor.moveToNext()) {
                     String id = cursor.getString(0);
@@ -190,10 +202,14 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void save(T item) {
+    public void save(T item) throws StoreNotOpenException {
+        ensureOpen();
+
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
         Serializable idValue = (Serializable) property.getValue(item);
@@ -237,13 +253,13 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             JsonPrimitive primitive = serialized.getAsJsonPrimitive();
             if (primitive.isBoolean()) {
                 String value = primitive.getAsBoolean() ? "true" : "false";
-                database.execSQL(sql, new Object[] { path, value, id });
+                database.execSQL(sql, new Object[]{path, value, id});
             } else if (primitive.isNumber()) {
                 Number value = primitive.getAsNumber();
-                database.execSQL(sql, new Object[] { path, value, id });
+                database.execSQL(sql, new Object[]{path, value, id});
             } else if (primitive.isString()) {
                 String value = primitive.getAsString();
-                database.execSQL(sql, new Object[] { path, value, id });
+                database.execSQL(sql, new Object[]{path, value, id});
             } else {
                 throw new IllegalArgumentException(serialized + " isn't a number, boolean, or string");
             }
@@ -253,19 +269,27 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void reset() {
+    public void reset() throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = String.format("Delete from %s_property", className);
         database.execSQL(sql);
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty() throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = String.format("Select count(_ID) from %s_property", className);
         Cursor cursor = database.rawQuery(sql, null);
         cursor.moveToFirst();
@@ -275,23 +299,25 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void remove(Serializable id) {
+    public void remove(Serializable id) throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = String.format("Delete from %s_property where PARENT_ID = ?", className);
         Object[] bindArgs = new Object[1];
         bindArgs[0] = id;
         database.execSQL(sql, bindArgs);
-
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         db.execSQL(String.format(CREATE_PROPERTIES_TABLE, className));
         db.execSQL(String.format(CREATE_PROPERTIES_INDEXES, className, className, className, className, className, className));
     }
@@ -418,4 +444,15 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             }
         }
     }
+
+    private boolean isOpen() {
+        return this.database != null;
+    }
+
+    private void ensureOpen() {
+        if (!isOpen()) {
+            throw new StoreNotOpenException();
+        }
+    }
+
 }

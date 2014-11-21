@@ -170,9 +170,14 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidKeyException Will occur if you use the wrong passphrase to retrieve the data
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public Collection<T> readAll() throws InvalidKeyException {
+    public Collection<T> readAll() throws InvalidKeyException, StoreNotOpenException {
+        ensureOpen();
+
         ArrayList<T> dataList = new ArrayList<T>();
 
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME;
@@ -192,9 +197,14 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws InvalidKeyException Will occur if you use the wrong passphrase to retrieve the data
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public T read(Serializable id) throws InvalidKeyException {
+    public T read(Serializable id) throws InvalidKeyException, StoreNotOpenException {
+        ensureOpen();
+
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
         Cursor cursor = getReadableDatabase().rawQuery(sql, new String[]{id.toString()});
         cursor.moveToFirst();
@@ -215,15 +225,19 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      * {@inheritDoc}
      */
     @Override
-    public List<T> readWithFilter(ReadFilter filter) throws InvalidKeyException {
+    public List<T> readWithFilter(ReadFilter filter) {
         throw new UnsupportedOperationException();
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void save(T item) {
+    public void save(T item) throws StoreNotOpenException {
+        ensureOpen();
+
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
         Serializable idValue = (Serializable) property.getValue(item);
@@ -242,27 +256,39 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void reset() {
+    public void reset() throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = String.format("DELETE FROM " + TABLE_NAME);
         this.database.execSQL(sql);
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void remove(Serializable id) {
+    public void remove(Serializable id) throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
         this.database.execSQL(sql, new Object[]{id});
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database 
      */
     @Override
-    public boolean isEmpty() {
+    public boolean isEmpty() throws StoreNotOpenException {
+        ensureOpen();
+
         String sql = "SELECT COUNT(" + COLUMN_ID + ") FROM " + TABLE_NAME;
         Cursor cursor = getReadableDatabase().rawQuery(sql, null);
         cursor.moveToFirst();
@@ -304,6 +330,16 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     @Override
     public void close() {
         this.database.close();
+    }
+
+    private boolean isOpen() {
+        return this.database != null;
+    }
+
+    private void ensureOpen() {
+        if (!isOpen()) {
+            throw new StoreNotOpenException();
+        }
     }
 
 }
