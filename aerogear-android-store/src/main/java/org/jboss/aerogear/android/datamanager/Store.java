@@ -65,6 +65,13 @@ public interface Store<T> {
     public void save(T item);
 
     /**
+     * Saves the given objects in the underlying storage system.
+     *
+     * @param items List of objects to save
+     */
+    public void save(Collection<T> items);
+
+    /**
      * Resets the entire storage system.
      */
     public void reset();

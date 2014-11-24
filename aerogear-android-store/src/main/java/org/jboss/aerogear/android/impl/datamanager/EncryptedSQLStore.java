@@ -238,6 +238,36 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     public void save(T item) throws StoreNotOpenException {
         ensureOpen();
 
+        this.database.beginTransaction();
+        try {
+            saveItem(item);
+            this.database.setTransactionSuccessful();
+        } finally {
+            this.database.endTransaction();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
+     */
+    @Override
+    public void save(Collection<T> items) throws StoreNotOpenException {
+        ensureOpen();
+
+        this.database.beginTransaction();
+        try {
+            for (T item : items) {
+                saveItem(item);
+            }
+            this.database.setTransactionSuccessful();
+        } finally {
+            this.database.endTransaction();
+        }
+    }
+
+    private void saveItem(T item) {
         String recordIdFieldName = Scan.recordIdFieldNameIn(item.getClass());
         Property property = new Property(item.getClass(), recordIdFieldName);
         Serializable idValue = (Serializable) property.getValue(item);

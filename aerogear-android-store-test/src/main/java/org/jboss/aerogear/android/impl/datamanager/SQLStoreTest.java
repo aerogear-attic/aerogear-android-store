@@ -19,11 +19,14 @@ package org.jboss.aerogear.android.impl.datamanager;
 import android.content.Context;
 import android.test.RenamingDelegatingContext;
 import junit.framework.Assert;
-import org.jboss.aerogear.android.*;
+import org.jboss.aerogear.android.Callback;
+import org.jboss.aerogear.android.DataManager;
+import org.jboss.aerogear.android.ReadFilter;
+import org.jboss.aerogear.android.RecordId;
 import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.store.test.MainActivity;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.store.test.MainActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -368,6 +371,39 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         try {
             SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
             store.isEmpty();
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testSaveCollection() {
+        List<Data> items = new ArrayList<Data>();
+        items.add(new Data(1, "Item 1", "This is the item 1"));
+        items.add(new Data(2, "Item 2", "This is the item 2"));
+        items.add(new Data(3, "Item 3", "This is the item 3"));
+        items.add(new Data(4, "Item 4", "This is the item 4"));
+        items.add(new Data(5, "Item 5", "This is the item 5"));
+
+        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+        store.openSync();
+        store.save(items);
+
+        Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
+    }
+
+    public void testSaveCollectionWithClosedStore() {
+        List<Data> items = new ArrayList<Data>();
+        items.add(new Data(1, "Item 1", "This is the item 1"));
+        items.add(new Data(2, "Item 2", "This is the item 2"));
+        items.add(new Data(3, "Item 3", "This is the item 3"));
+        items.add(new Data(4, "Item 4", "This is the item 4"));
+        items.add(new Data(5, "Item 5", "This is the item 5"));
+
+        try {
+            SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
+            store.save(items);
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
