@@ -72,6 +72,16 @@ public class MemoryStore<T> implements Store<T> {
         save(idValue, item);
     }
 
+    /*
+     * {@inheritDoc}
+     */
+    @Override
+    public void save(Collection<T> items) {
+        for (T item : items) {
+            save(item);
+        }
+    }
+
     void save(Serializable id, T item) {
         data.put(id, item);
     }
