@@ -25,6 +25,8 @@ import org.jboss.aerogear.android.impl.helper.Data;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
 import org.jboss.aerogear.android.store.test.MainActivity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
@@ -189,6 +191,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
             EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
                     Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
             closedStore.readAll();
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
@@ -200,6 +203,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
             EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
                     Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
             closedStore.read(Long.valueOf("1"));
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
@@ -211,6 +215,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
             EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
                     Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
             closedStore.save(new Data("AeroGear", "The best framework for mobile development."));
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
@@ -222,6 +227,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
             EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
                     Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
             closedStore.remove(Long.valueOf("1"));
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
@@ -233,6 +239,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
             EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
                     Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
             closedStore.reset();
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
@@ -244,6 +251,42 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
             EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
                     Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
             closedStore.isEmpty();
+
+            Assert.fail("Should have thrown StoreNotOpenException");
+        } catch (StoreNotOpenException e) {
+            // Sucess
+        }
+    }
+
+    public void testSaveCollection() {
+        List<Data> items = new ArrayList<Data>();
+        items.add(new Data(1, "Item 1", "This is the item 1"));
+        items.add(new Data(2, "Item 2", "This is the item 2"));
+        items.add(new Data(3, "Item 3", "This is the item 3"));
+        items.add(new Data(4, "Item 4", "This is the item 4"));
+        items.add(new Data(5, "Item 5", "This is the item 5"));
+
+        EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
+                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+        store.openSync();
+        store.save(items);
+
+        Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
+    }
+
+    public void testSaveCollectionWithClosedStore() {
+        List<Data> items = new ArrayList<Data>();
+        items.add(new Data(1, "Item 1", "This is the item 1"));
+        items.add(new Data(2, "Item 2", "This is the item 2"));
+        items.add(new Data(3, "Item 3", "This is the item 3"));
+        items.add(new Data(4, "Item 4", "This is the item 4"));
+        items.add(new Data(5, "Item 5", "This is the item 5"));
+
+        try {
+            EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
+                    Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
+            store.save(items);
+
             Assert.fail("Should have thrown StoreNotOpenException");
         } catch (StoreNotOpenException e) {
             // Sucess
