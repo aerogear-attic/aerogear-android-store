@@ -105,6 +105,16 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      * {@inheritDoc}
      */
     @Override
+    public void save(Collection<T> items) {
+        for (T item : items) {
+            save(item);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void reset() {
         memoryStore.reset();
     }

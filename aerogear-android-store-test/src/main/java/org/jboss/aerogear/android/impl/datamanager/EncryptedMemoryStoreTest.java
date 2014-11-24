@@ -21,10 +21,12 @@ import org.jboss.aerogear.android.DataManager;
 import org.jboss.aerogear.android.ReadFilter;
 import org.jboss.aerogear.android.datamanager.Store;
 import org.jboss.aerogear.android.impl.helper.Data;
-import org.jboss.aerogear.android.store.test.MainActivity;
 import org.jboss.aerogear.android.impl.util.PatchedActivityInstrumentationTestCase;
+import org.jboss.aerogear.android.store.test.MainActivity;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.jboss.aerogear.android.impl.datamanager.StoreTypes.ENCRYPTED_MEMORY;
 
@@ -43,12 +45,7 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
         String passphrase = "Lorem Ipsum";
         Class<Data> dataModel = Data.class;
 
-        store = DataManager
-                .config("testMemoryStore", EncryptedMemoryStoreConfiguration.class)
-                .withIdGenerator(stubIdGenerator)
-                .usingPassphrase(passphrase)
-                .forClass(dataModel)
-                .store();
+        store = new EncryptedMemoryStore<Data>(stubIdGenerator, passphrase, dataModel);
     }
 
     public void testCreateSQLStoreWithoutKlass() {
@@ -116,7 +113,7 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
     
     public void testReadWithFilter() {
         try {
-            Collection<Data> datas = store.readWithFilter(new ReadFilter());
+            store.readWithFilter(new ReadFilter());
         } catch (UnsupportedOperationException ignore) {
             return;
         }
@@ -195,6 +192,18 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
     public void testIsNotEmpty() {
         store.save(new Data("foo", "desc of foo"));
         assertFalse("should not be empty", store.isEmpty());
+    }
+
+    public void testSaveCollection() {
+        List<Data> items = new ArrayList<Data>();
+        items.add(new Data(1, "Item 1", "This is the item 1"));
+        items.add(new Data(2, "Item 2", "This is the item 2"));
+        items.add(new Data(3, "Item 3", "This is the item 3"));
+        items.add(new Data(4, "Item 4", "This is the item 4"));
+        items.add(new Data(5, "Item 5", "This is the item 5"));
+        store.save(items);
+
+        Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
     }
 
 }
