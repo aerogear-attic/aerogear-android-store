@@ -45,14 +45,6 @@
             <version>2.0.0-SNAPSHOT</version>
             <type>aar</type>
         </dependency>
-<!--
-        <dependency>
-            <groupId>org.jboss.aerogear</groupId>
-            <artifactId>aerogear-android-core</artifactId>
-            <version>${aerogear.android.core.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>-->
 
         <dependency>
             <groupId>org.jboss.aerogear</groupId>
@@ -60,14 +52,6 @@
             <version>2.0.0-SNAPSHOT</version>
             <type>aar</type>
         </dependency>
-<!--
-        <dependency>
-            <groupId>org.jboss.aerogear</groupId>
-            <artifactId>aerogear-android-security</artifactId>
-            <version>${aerogear.android.security.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>-->
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -77,12 +61,11 @@
 
     </dependencies>
 
-
     <build>
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                    <groupId>com.simpligility.maven.plugins</groupId>
                     <artifactId>android-maven-plugin</artifactId>
                     <version>${maven.android.plugin.version}</version>
                     <extensions>true</extensions>
@@ -90,6 +73,7 @@
             </plugins>
         </pluginManagement>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -112,6 +96,7 @@
                     </sourceFileExcludes>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -120,8 +105,9 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
+
             <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <groupId>com.simpligility.maven.plugins</groupId>
                 <artifactId>android-maven-plugin</artifactId>
                 <configuration>
                     <run>
@@ -139,6 +125,7 @@
                     </proguard>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -160,6 +147,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
