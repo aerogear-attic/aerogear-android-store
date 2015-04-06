@@ -267,6 +267,52 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
 
     }
 
+    
+    public void testNestedListSaveAndFilterOnTestedCollection() throws InterruptedException, JSONException {
+        ReadFilter filter;
+        JSONObject where;
+        List<TrivialNestedClassWithCollection> result;
+
+        List<Data> data = new ArrayList<Data>();
+        data.add(new Data(10, "name1", "description"));
+        data.add(new Data(30, "name2", "description"));
+
+        TrivialNestedClassWithCollection newNested = new TrivialNestedClassWithCollection();
+        newNested.setId(1);
+        newNested.setText("nestedText1");
+        newNested.setData(data);
+
+        nestedWithCollectionStore.openSync();
+        nestedWithCollectionStore.save(newNested);
+
+        
+        data = new ArrayList<Data>();
+        data.add(new Data(10, "name3", "description"));
+        data.add(new Data(30, "name4", "description"));
+
+        newNested = new TrivialNestedClassWithCollection();
+        newNested.setId(2);
+        newNested.setText("nestedText2");
+        newNested.setData(data);
+
+        nestedWithCollectionStore.save(newNested);
+
+        
+        filter = new ReadFilter();
+        where = new JSONObject();
+        where.put("data.name", "name2");
+        
+
+        filter.setWhere(where);
+        result = nestedWithCollectionStore.readWithFilter(filter);
+        assertEquals(1, result.size());
+        TrivialNestedClassWithCollection nestedResult = result.get(0);
+        assertEquals((Integer) 10, nestedResult.data.get(0).getId());
+        assertEquals((Integer) 30, nestedResult.data.get(1).getId());
+
+    }
+
+    
     public void testSuccessCallback() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(2);
         store.open(new Callback<SQLStore<Data>>() {
