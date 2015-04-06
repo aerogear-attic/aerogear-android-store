@@ -300,7 +300,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase<MainAct
         
         filter = new ReadFilter();
         where = new JSONObject();
-        where.put("data.name", "name2");
+        where.put("data[%].name", "name2");
         
 
         filter.setWhere(where);

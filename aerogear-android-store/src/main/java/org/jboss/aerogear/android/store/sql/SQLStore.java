@@ -158,7 +158,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         if (filter == null) {
             filter = new ReadFilter();
         }
-        String sql = String.format("select PARENT_ID from %s_property where PROPERTY_NAME = ? and PROPERTY_VALUE = ?", className);
+        String sql = String.format("select PARENT_ID from %s_property where PROPERTY_NAME LIKE ? and PROPERTY_VALUE = ?", className);
         JsonObject where = (JsonObject) new JsonParser().parse(filter.getWhere().toString());
         List<Pair<String, String>> queryList = new ArrayList<Pair<String, String>>();
         Map<String, AtomicInteger> resultCount = new HashMap<String, AtomicInteger>();
