@@ -17,32 +17,34 @@
 package org.jboss.aerogear.android.store.test;
 
 
+import android.support.test.runner.AndroidJUnit4;
 import org.jboss.aerogear.android.core.ConfigurationProvider;
 import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
 import org.jboss.aerogear.android.store.DataManager;
 import org.jboss.aerogear.android.store.Store;
 import org.jboss.aerogear.android.store.StoreConfiguration;
 import org.jboss.aerogear.android.store.memory.MemoryStoreConfiguration;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class DataManagerTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
+@RunWith(AndroidJUnit4.class)
+public class DataManagerTest extends PatchedActivityInstrumentationTestCase {
 
     public DataManagerTest() {
         super(MainActivity.class);
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
+    @Test
     public void testCreateStore() {
         Store store = DataManager
                 .config("foo1", MemoryStoreConfiguration.class)
                 .store();
 
-        assertNotNull("store could not be null", store);
+        Assert.assertNotNull("store could not be null", store);
     }
 
+    @Test
     public void testGetStore() {
         DataManager
                 .config("foo2", MemoryStoreConfiguration.class)
@@ -50,9 +52,10 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
 
         Store store = DataManager.getStore("foo2");
 
-        assertNotNull("store could not be null", store);
+        Assert.assertNotNull("store could not be null", store);
     }
 
+    @Test
     public void testCreateMoreThanOneStoreInDataManager() {
         DataManager
                 .config("foo4", MemoryStoreConfiguration.class)
@@ -65,15 +68,16 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase<Main
         Store store1 = DataManager.getStore("foo4");
         Store store2 = DataManager.getStore("foo5");
 
-        assertNotNull("store could not be null", store1);
-        assertNotNull("store could not be null", store2);
+        Assert.assertNotNull("store could not be null", store1);
+        Assert.assertNotNull("store could not be null", store2);
     }
 
+    @Test
     public void testAddNewProvider() {
 
         DataManager.registerConfigurationProvider(StubStoreConfiguration.class, new DummyStoreConfigProvider());
         StubStoreConfiguration config = DataManager.config("test", StubStoreConfiguration.class);
-        assertNotNull(config);
+        Assert.assertNotNull(config);
 
     }
 
