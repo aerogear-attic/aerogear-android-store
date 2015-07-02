@@ -1,22 +1,23 @@
 /**
- * JBoss, Home of Professional Open Source
- * Copyright Red Hat, Inc., and individual contributors.
+ * JBoss, Home of Professional Open Source Copyright Red Hat, Inc., and
+ * individual contributors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.jboss.aerogear.android.store.test.memory;
 
-import junit.framework.Assert;
+import android.support.test.runner.AndroidJUnit4;
+import org.junit.Assert;
 import org.jboss.aerogear.android.core.ReadFilter;
 import org.jboss.aerogear.android.store.Store;
 import org.jboss.aerogear.android.store.test.helper.Data;
@@ -34,8 +35,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase<MainActivity> {
+@RunWith(AndroidJUnit4.class)
+public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase {
 
     private Store<Data> store;
     private StubIdGenerator stubIdGenerator;
@@ -44,32 +49,33 @@ public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase<Main
         super(MainActivity.class);
     }
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         stubIdGenerator = new StubIdGenerator();
         store = new MemoryStore<Data>(stubIdGenerator);
     }
 
-
+    @Test
     public void testReadAll() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
 
         Collection<Data> datas = store.readAll();
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 2 data", 2, datas.size());
+        Assert.assertNotNull("datas could not be null", datas);
+        Assert.assertEquals("datas should 2 data", 2, datas.size());
     }
 
+    @Test
     public void testReadWithFilter() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
 
         Collection<Data> datas = store.readWithFilter(new ReadFilter());
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 2 data", 2, datas.size());
+        Assert.assertNotNull("datas could not be null", datas);
+        Assert.assertEquals("datas should 2 data", 2, datas.size());
     }
 
+    @Test
     public void testReadWithFilterPerPage() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -78,15 +84,16 @@ public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase<Main
         filter.setLimit(1);
 
         Collection<Data> datas = store.readWithFilter(filter);
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 1 data", 1, datas.size());
-        assertEquals("foo", datas.iterator().next().getName());
+        Assert.assertNotNull("datas could not be null", datas);
+        Assert.assertEquals("datas should 1 data", 1, datas.size());
+        Assert.assertEquals("foo", datas.iterator().next().getName());
 
         filter.setOffset(1);
         datas = store.readWithFilter(filter);
-        assertEquals("bar", datas.iterator().next().getName());
+        Assert.assertEquals("bar", datas.iterator().next().getName());
     }
 
+    @Test
     public void testReadWithFilterWhere() throws JSONException {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
@@ -96,35 +103,35 @@ public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase<Main
 
         Collection<Data> datas = store.readWithFilter(filter);
 
-        assertNotNull("datas could not be null", datas);
-        assertEquals("datas should 1 data", 1, datas.size());
-        assertEquals("bar", datas.iterator().next().getName());
+        Assert.assertNotNull("datas could not be null", datas);
+        Assert.assertEquals("datas should 1 data", 1, datas.size());
+        Assert.assertEquals("bar", datas.iterator().next().getName());
     }
 
+    @Test(expected = IllegalArgumentException.class)
     public void testReadWithFilterThrowsExceptionWithNestingJSON() throws JSONException {
-        try {
-            ReadFilter filter = new ReadFilter();
-            filter.setWhere(new JSONObject("{\"name\":{\"name\":\"bar\"}}"));
 
-            Collection<Data> datas = store.readWithFilter(filter);
-        } catch (IllegalArgumentException ignore) {
-            return;
-        }
-        fail("Expected IllegalArgumentException");
+        ReadFilter filter = new ReadFilter();
+        filter.setWhere(new JSONObject("{\"name\":{\"name\":\"bar\"}}"));
+        store.readWithFilter(filter);
+
     }
 
+    @Test
     public void testRead() {
         store.save(new Data("foo", "desc of foo"));
         Data data = store.read(1);
-        assertNotNull("data could not be null", data);
+        Assert.assertNotNull("data could not be null", data);
     }
 
+    @Test
     public void testSaveNoExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
-        assertEquals(Integer.valueOf(1), data.getId());
+        Assert.assertEquals(Integer.valueOf(1), data.getId());
     }
 
+    @Test
     public void testSaveExistRecord() {
         Data data = new Data("foo", "desc of foo");
         store.save(data);
@@ -135,79 +142,78 @@ public class MemoryStoreTest extends PatchedActivityInstrumentationTestCase<Main
 
         data = store.read(1);
 
-        assertEquals(Integer.valueOf(1), data.getId());
-        assertEquals("bar", data.getName());
-        assertEquals("desc of bar", data.getDescription());
+        Assert.assertEquals(Integer.valueOf(1), data.getId());
+        Assert.assertEquals("bar", data.getName());
+        Assert.assertEquals("desc of bar", data.getDescription());
     }
 
+    @Test(expected = RecordIdNotFoundException.class)
     public void testSaveWithAnnotationNotConfigured() {
-        try {
-            MemoryStore<DataWithNoIdConfigured> memoryStore = new MemoryStore<DataWithNoIdConfigured>(stubIdGenerator);
-            memoryStore.save(new DataWithNoIdConfigured());
-        } catch (RecordIdNotFoundException ignore) {
-            return;
-        }
-        fail("Expected RecordIdNotFoundException");
+
+        MemoryStore<DataWithNoIdConfigured> memoryStore = new MemoryStore<DataWithNoIdConfigured>(stubIdGenerator);
+        memoryStore.save(new DataWithNoIdConfigured());
+
     }
 
+    @Test(expected = PropertyNotFoundException.class)
     public void testSaveWithNoPropertyToSetId() {
-        try {
-            MemoryStore<DataWithNoPropertyId> memoryStore = new MemoryStore<DataWithNoPropertyId>(stubIdGenerator);
-            memoryStore.save(new DataWithNoPropertyId());
-        } catch (PropertyNotFoundException ignore) {
-            return;
-        }
-        fail("Expected PropertyNotFoundException");
+        MemoryStore<DataWithNoPropertyId> memoryStore = new MemoryStore<DataWithNoPropertyId>(stubIdGenerator);
+        memoryStore.save(new DataWithNoPropertyId());
+
     }
 
+    @Test
     public void testReset() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
 
         Data foo = store.read(1);
-        assertNotNull("foo could not be null", foo);
+        Assert.assertNotNull("foo could not be null", foo);
 
         Data bar = store.read(2);
-        assertNotNull("bar could not be null", bar);
+        Assert.assertNotNull("bar could not be null", bar);
 
         store.reset();
 
         foo = store.read(1);
-        assertNull("foo should be null", foo);
+        Assert.assertNull("foo should be null", foo);
 
         bar = store.read(2);
-        assertNull("bar should be null", bar);
+        Assert.assertNull("bar should be null", bar);
     }
 
+    @Test
     public void testRemove() {
         store.save(new Data("foo", "desc of foo"));
         store.save(new Data("bar", "desc of bar"));
 
         Data foo = store.read(1);
-        assertNotNull("foo could not be null", foo);
+        Assert.assertNotNull("foo could not be null", foo);
 
         Data bar = store.read(2);
-        assertNotNull("bar could not be null", bar);
+        Assert.assertNotNull("bar could not be null", bar);
 
         store.remove(2);
 
         foo = store.read(1);
-        assertNotNull("foo could not be null", foo);
+        Assert.assertNotNull("foo could not be null", foo);
 
         bar = store.read(2);
-        assertNull("bar should be null", bar);
+        Assert.assertNull("bar should be null", bar);
     }
 
+    @Test
     public void testIsEmpty() {
-        assertTrue("should be empty", store.isEmpty());
+        Assert.assertTrue("should be empty", store.isEmpty());
     }
 
-
+    @Test
     public void testIsNotEmpty() {
         store.save(new Data("foo", "desc of foo"));
-        assertFalse("should not be empty", store.isEmpty());
+        Assert.assertFalse("should not be empty", store.isEmpty());
     }
 
+    @Test
     public void testSaveCollection() {
         List<Data> items = new ArrayList<Data>();
         items.add(new Data(1, "Item 1", "This is the item 1"));
