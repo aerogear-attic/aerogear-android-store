@@ -20,24 +20,25 @@ import android.content.Context;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.RenamingDelegatingContext;
 import com.google.gson.GsonBuilder;
-import org.junit.Assert;
 import org.jboss.aerogear.android.store.DataManager;
-import org.jboss.aerogear.android.store.test.helper.Data;
-import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
 import org.jboss.aerogear.android.store.StoreNotOpenException;
 import org.jboss.aerogear.android.store.generator.DefaultIdGenerator;
 import org.jboss.aerogear.android.store.sql.EncryptedSQLStore;
 import org.jboss.aerogear.android.store.sql.EncryptedSQLStoreConfiguration;
 import org.jboss.aerogear.android.store.test.MainActivity;
+import org.jboss.aerogear.android.store.test.helper.Data;
+import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCase {

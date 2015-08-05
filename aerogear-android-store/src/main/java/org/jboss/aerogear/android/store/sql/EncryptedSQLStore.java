@@ -24,21 +24,21 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.google.gson.GsonBuilder;
-import org.jboss.aerogear.AeroGearCrypto;
 import org.jboss.aerogear.android.core.Callback;
 import org.jboss.aerogear.android.core.ReadFilter;
-import org.jboss.aerogear.android.store.*;
-import org.jboss.aerogear.android.security.InvalidKeyException;
 import org.jboss.aerogear.android.core.reflection.Property;
 import org.jboss.aerogear.android.core.reflection.Scan;
-import org.jboss.aerogear.android.security.util.CryptoUtils;
+import org.jboss.aerogear.android.security.EncryptionService;
+import org.jboss.aerogear.android.security.InvalidKeyException;
+import org.jboss.aerogear.android.security.SecurityManager;
+import org.jboss.aerogear.android.security.keystore.KeyStoreBasedEncryptionConfiguration;
+import org.jboss.aerogear.android.security.util.CryptoEntityUtil;
+import org.jboss.aerogear.android.store.Store;
+import org.jboss.aerogear.android.store.StoreNotOpenException;
 import org.jboss.aerogear.android.store.generator.IdGenerator;
 import org.jboss.aerogear.crypto.RandomUtils;
-import org.jboss.aerogear.crypto.keys.PrivateKey;
-import org.jboss.aerogear.crypto.password.Pbkdf2;
 
 import java.io.Serializable;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,50 +47,47 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private static final String TAG = EncryptedSQLStore.class.getSimpleName();
 
-    private final Class<T> modelClass;
-    private final GsonBuilder builder;
-    private final IdGenerator idGenerator;
-    private final String passphrase;
-
-    private CryptoUtils<T> cryptoUtils;
-
-    private final String ENCRYPT_HELPER_TABLE_SUFIX = "_ENCRYPT_HELPER";
-
-    private final String TABLE_NAME;
     private final String COLUMN_ID = "ID";
     private final String COLUMN_DATA = "DATA";
-
     private final String ID_IV = "IV";
-    private final String ID_SALT = "SALT";
+
+    private final Class<T> modelClass;
+    private Context context;
+    private final GsonBuilder builder;
+    private final IdGenerator idGenerator;
+    private final String password;
+    private final String TABLE_NAME;
+
     private SQLiteDatabase database;
+    private CryptoEntityUtil<T> cryptoEntityUtil;
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-                             IdGenerator idGenerator, String passphrase) {
-        this(modelClass, context, builder, idGenerator, passphrase, modelClass.getSimpleName());
+                             IdGenerator idGenerator, String password) {
+        this(modelClass, context, builder, idGenerator, password, modelClass.getSimpleName());
     }
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-                             IdGenerator idGenerator, String passphrase, String tableName) {
+                             IdGenerator idGenerator, String password, String tableName) {
 
-        super(context, modelClass.getSimpleName(), null, 1);
+        super(context, modelClass.getSimpleName(), null, 2);
 
         this.modelClass = modelClass;
+        this.context = context;
         this.builder = builder;
         this.idGenerator = idGenerator;
-        this.passphrase = passphrase;
+        this.password = password;
 
         this.TABLE_NAME = tableName;
     }
 
     private String getEncryptTableHelperName() {
-        return TABLE_NAME.toUpperCase() + ENCRYPT_HELPER_TABLE_SUFIX;
+        return TABLE_NAME.toUpperCase() + "_ENCRYPT_HELPER";
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        byte[] salt = RandomUtils.randomBytes();
-        byte[] iv = RandomUtils.randomBytes();
+        // -- Table for helper data
 
         String SQL_CREATE_ENCRYPT_HELPER_TABLE = "CREATE TABLE IF NOT EXISTS " + getEncryptTableHelperName() +
                 " ( " +
@@ -99,15 +96,17 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
                 " ) ";
         sqLiteDatabase.execSQL(SQL_CREATE_ENCRYPT_HELPER_TABLE);
 
-        String SQL_STORE_IV = "INSERT INTO " + getEncryptTableHelperName() +
-                " ( " + COLUMN_ID + ", " + COLUMN_DATA + " ) " +
-                " VALUES ( ?, ? ) ";
-        sqLiteDatabase.execSQL(SQL_STORE_IV, new Object[]{ID_IV, iv});
+        // -- Store iv
 
-        String SQL_STORE_SALT = "INSERT INTO " + getEncryptTableHelperName() +
+        byte[] iv = RandomUtils.randomBytes();
+
+        String SQL_STORE_DATA = "INSERT INTO " + getEncryptTableHelperName() +
                 " ( " + COLUMN_ID + ", " + COLUMN_DATA + " ) " +
                 " VALUES ( ?, ? ) ";
-        sqLiteDatabase.execSQL(SQL_STORE_SALT, new Object[]{ID_SALT, salt});
+
+        sqLiteDatabase.execSQL(SQL_STORE_DATA, new Object[]{ID_IV, iv});
+
+        // -- Table for encrypted data
 
         String SQL_CREATE_ENTITY_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
                 " ( " +
@@ -115,6 +114,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
                 COLUMN_DATA + " BLOB NOT NULL " +
                 " ) ";
         sqLiteDatabase.execSQL(SQL_CREATE_ENTITY_TABLE);
+
     }
 
     @Override
@@ -123,10 +123,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     @Override
     public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
 
-        byte[] iv;
-        byte[] salt;
+        super.onOpen(db);
 
         String SQL = "SELECT " + COLUMN_DATA + " FROM " + getEncryptTableHelperName() + " WHERE " + COLUMN_ID + " = ?";
 
@@ -134,27 +132,21 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         cursorIV.moveToFirst();
 
         try {
-            iv = cursorIV.getBlob(0);
+
+            byte[] iv = cursorIV.getBlob(0);
+
+            EncryptionService encryptionService = SecurityManager
+                    .config(TABLE_NAME, KeyStoreBasedEncryptionConfiguration.class)
+                    .setContext(context)
+                    .setAlias(TABLE_NAME)
+                    .setKeyStoreFile(TABLE_NAME)
+                    .setPassword(password)
+                    .asService();
+
+            cryptoEntityUtil = new CryptoEntityUtil<T>(encryptionService, iv, modelClass, builder);
+
         } finally {
             cursorIV.close();
-        }
-
-        Cursor cursorSalt = db.rawQuery(SQL, new String[]{ID_SALT});
-        cursorSalt.moveToFirst();
-
-        try {
-            salt = cursorSalt.getBlob(0);
-        } finally {
-            cursorSalt.close();
-        }
-
-        try {
-            Pbkdf2 pbkdf2 = AeroGearCrypto.pbkdf2();
-            byte[] rawPassword = pbkdf2.encrypt(passphrase, salt);
-            PrivateKey privateKey = new PrivateKey(rawPassword);
-            cryptoUtils = new CryptoUtils<T>(privateKey, iv, modelClass, builder);
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
         }
 
     }
@@ -162,8 +154,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws InvalidKeyException Will occur if you use the wrong passphrase to retrieve the data
-     * @throws org.jboss.aerogear.android.store.StoreNotOpenException Will occur if this method is called before opening the database
+     * @throws InvalidKeyException   Will occur if you use the wrong password to retrieve the data
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException, StoreNotOpenException {
@@ -176,7 +168,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         try {
             while (cursor.moveToNext()) {
                 byte[] encryptedData = cursor.getBlob(0);
-                T decryptedData = cryptoUtils.decrypt(encryptedData);
+                T decryptedData = cryptoEntityUtil.decrypt(encryptedData);
                 dataList.add(decryptedData);
             }
         } finally {
@@ -189,7 +181,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws InvalidKeyException Will occur if you use the wrong passphrase to retrieve the data
+     * @throws InvalidKeyException   Will occur if you use the wrong password to retrieve the data
      * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
@@ -206,7 +198,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
         try {
             byte[] encryptedData = cursor.getBlob(0);
-            return cryptoUtils.decrypt(encryptedData);
+            return cryptoEntityUtil.decrypt(encryptedData);
         } finally {
             cursor.close();
         }
@@ -270,7 +262,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, idValue.toString());
-        values.put(COLUMN_DATA, cryptoUtils.encrypt(item));
+        values.put(COLUMN_DATA, cryptoEntityUtil.encrypt(item));
 
         this.database.insert(TABLE_NAME, null, values);
     }
@@ -304,7 +296,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database 
+     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public boolean isEmpty() throws StoreNotOpenException {
