@@ -16,41 +16,42 @@
  */
 package org.jboss.aerogear.android.store.memory;
 
-import org.jboss.aerogear.AeroGearCrypto;
+import android.content.Context;
 import org.jboss.aerogear.android.core.ReadFilter;
-import org.jboss.aerogear.android.store.generator.IdGenerator;
-import org.jboss.aerogear.android.store.Store;
+import org.jboss.aerogear.android.security.EncryptionService;
 import org.jboss.aerogear.android.security.InvalidKeyException;
-import org.jboss.aerogear.android.security.util.CryptoUtils;
+import org.jboss.aerogear.android.security.keystore.KeyStoreBasedEncryptionConfiguration;
+import org.jboss.aerogear.android.security.util.CryptoEntityUtil;
+import org.jboss.aerogear.android.store.Store;
+import org.jboss.aerogear.android.store.generator.IdGenerator;
 import org.jboss.aerogear.crypto.RandomUtils;
-import org.jboss.aerogear.crypto.keys.PrivateKey;
-import org.jboss.aerogear.crypto.password.Pbkdf2;
 
 import java.io.Serializable;
-import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class EncryptedMemoryStore<T> implements Store<T> {
 
     private final MemoryStore<byte[]> memoryStore;
-    private final CryptoUtils<T> cryptoUtils;
+    private final CryptoEntityUtil<T> cryptoEntityUtil;
 
-    public EncryptedMemoryStore(IdGenerator idGenerator, String passphrase, Class<T> modelClass) {
-        memoryStore = new MemoryStore(idGenerator);
+    public EncryptedMemoryStore(Context context, IdGenerator idGenerator, String password, Class<T> modelClass) {
+
+        memoryStore = new MemoryStore<byte[]>(idGenerator);
 
         byte[] iv = RandomUtils.randomBytes();
-        byte[] salt = RandomUtils.randomBytes();
-        byte[] rawPassword = new byte[0];
 
-        try {
-            Pbkdf2 pbkdf2 = AeroGearCrypto.pbkdf2();
-            rawPassword = pbkdf2.encrypt(passphrase, salt);
-        } catch (InvalidKeySpecException e) {
-        }
+        EncryptionService encryptionService = org.jboss.aerogear.android.security.SecurityManager
+                .config(modelClass.getName(), KeyStoreBasedEncryptionConfiguration.class)
+                .setContext(context)
+                .setAlias(modelClass.getName())
+                .setKeyStoreFile(modelClass.getName())
+                .setPassword(password)
+                .asService();
 
-        PrivateKey privateKey = new PrivateKey(rawPassword);
-        cryptoUtils = new CryptoUtils<T>(privateKey, iv, modelClass);
+        cryptoEntityUtil = new CryptoEntityUtil<T>(encryptionService, iv, modelClass);
+
     }
 
     /**
@@ -58,8 +59,15 @@ public class EncryptedMemoryStore<T> implements Store<T> {
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException {
+        ArrayList<T> dataList = new ArrayList<T>();
+
         Collection<byte[]> encryptedCollection = memoryStore.readAll();
-        return cryptoUtils.decrypt(encryptedCollection);
+        for (byte[] encryptedData : encryptedCollection) {
+            T decryptedData = cryptoEntityUtil.decrypt(encryptedData);
+            dataList.add(decryptedData);
+        }
+
+        return dataList;
     }
 
     /**
@@ -71,7 +79,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
         if (encryptedItem == null) {
             return null;
         } else {
-            return cryptoUtils.decrypt(encryptedItem);
+            return cryptoEntityUtil.decrypt(encryptedItem);
         }
     }
 
@@ -89,7 +97,7 @@ public class EncryptedMemoryStore<T> implements Store<T> {
     @Override
     public void save(T item) {
         Serializable idValue = memoryStore.getOrGenerateIdValue(item);
-        memoryStore.save(idValue, cryptoUtils.encrypt(item));
+        memoryStore.save(idValue, cryptoEntityUtil.encrypt(item));
     }
 
     /**

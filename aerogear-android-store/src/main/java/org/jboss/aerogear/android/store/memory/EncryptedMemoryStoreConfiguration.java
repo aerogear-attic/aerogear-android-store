@@ -16,26 +16,33 @@
  */
 package org.jboss.aerogear.android.store.memory;
 
+import android.content.Context;
 import org.jboss.aerogear.android.core.Config;
-import org.jboss.aerogear.android.store.generator.DefaultIdGenerator;
-import org.jboss.aerogear.android.store.generator.IdGenerator;
 import org.jboss.aerogear.android.store.Store;
 import org.jboss.aerogear.android.store.StoreConfiguration;
+import org.jboss.aerogear.android.store.generator.DefaultIdGenerator;
+import org.jboss.aerogear.android.store.generator.IdGenerator;
 
 public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<EncryptedMemoryStoreConfiguration>
         implements Config<EncryptedMemoryStoreConfiguration> {
 
+    private Context context;
     private IdGenerator idGenerator = new DefaultIdGenerator();
-    private String passphrase;
+    private String password;
     private Class klass;
+
+    public EncryptedMemoryStoreConfiguration withContext(Context context) {
+        this.context = context;
+        return this;
+    }
 
     public EncryptedMemoryStoreConfiguration withIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
 
-    public EncryptedMemoryStoreConfiguration usingPassphrase(String passphrase) {
-        this.passphrase = passphrase;
+    public EncryptedMemoryStoreConfiguration usingPassword(String passphrase) {
+        this.password = passphrase;
         return this;
     }
 
@@ -47,11 +54,11 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
 
     @Override
     protected Store buildStore() {
-        if((klass == null) || (passphrase == null)) {
-            throw new IllegalStateException("Klass and Passphrase are mandatory");
+        if ((context == null) || (klass == null) || (password == null)) {
+            throw new IllegalStateException("Context, Klass and Passphrase are mandatory");
         }
 
-        return new EncryptedMemoryStore(idGenerator, passphrase, klass);
+        return new EncryptedMemoryStore(context, idGenerator, password, klass);
     }
 
 }

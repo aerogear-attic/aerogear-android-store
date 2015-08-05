@@ -16,11 +16,10 @@
  */
 package org.jboss.aerogear.android.store.test.memory;
 
+import android.content.Context;
 import android.support.test.runner.AndroidJUnit4;
-import org.junit.Assert;
+import android.test.RenamingDelegatingContext;
 import org.jboss.aerogear.android.core.ReadFilter;
-import org.jboss.aerogear.android.store.test.helper.Data;
-import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
 import org.jboss.aerogear.android.store.DataManager;
 import org.jboss.aerogear.android.store.Store;
 import org.jboss.aerogear.android.store.memory.EncryptedMemoryStore;
@@ -28,13 +27,17 @@ import org.jboss.aerogear.android.store.memory.EncryptedMemoryStoreConfiguration
 import org.jboss.aerogear.android.store.sql.SQLStoreConfiguration;
 import org.jboss.aerogear.android.store.test.MainActivity;
 import org.jboss.aerogear.android.store.test.generator.StubIdGenerator;
+import org.jboss.aerogear.android.store.test.helper.Data;
+import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.UUID;
 
 @RunWith(AndroidJUnit4.class)
 public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTestCase {
@@ -47,18 +50,20 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
 
     @Before
     public void setUp() throws Exception {
+        Context context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
+
         StubIdGenerator stubIdGenerator = new StubIdGenerator();
         String passphrase = "Lorem Ipsum";
         Class<Data> dataModel = Data.class;
 
-        store = new EncryptedMemoryStore<Data>(stubIdGenerator, passphrase, dataModel);
+        store = new EncryptedMemoryStore<Data>(context, stubIdGenerator, passphrase, dataModel);
     }
 
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutKlass() {
 
         Store<Data> store1 = DataManager.config("store1", EncryptedMemoryStoreConfiguration.class)
-                .usingPassphrase("AeroGear")
+                .usingPassword("AeroGear")
                 .store();
 
         Data data = new Data(10, "name", "description");
