@@ -21,9 +21,9 @@ import org.jboss.aerogear.android.core.ReadFilter;
 import org.jboss.aerogear.android.security.EncryptionService;
 import org.jboss.aerogear.android.security.InvalidKeyException;
 import org.jboss.aerogear.android.security.keystore.KeyStoreBasedEncryptionConfiguration;
-import org.jboss.aerogear.android.security.util.CryptoEntityUtil;
 import org.jboss.aerogear.android.store.Store;
 import org.jboss.aerogear.android.store.generator.IdGenerator;
+import org.jboss.aerogear.android.store.util.CryptoEntityUtil;
 import org.jboss.aerogear.crypto.RandomUtils;
 
 import java.io.Serializable;
