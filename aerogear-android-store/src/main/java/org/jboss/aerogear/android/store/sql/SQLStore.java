@@ -87,7 +87,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public Collection<T> readAll() throws StoreNotOpenException {
+    public Collection<T> readAll(){
         ensureOpen();
 
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE,PARENT_ID from %s_property", className);
@@ -118,10 +118,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public T read(Serializable id) throws StoreNotOpenException {
+    public T read(Serializable id) {
         ensureOpen();
 
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE from %s_property where PARENT_ID = ?", className);
@@ -149,10 +148,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public List<T> readWithFilter(ReadFilter filter) throws StoreNotOpenException {
+    public List<T> readWithFilter(ReadFilter filter){
         ensureOpen();
 
         if (filter == null) {
@@ -196,10 +194,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void save(T item) throws StoreNotOpenException {
+    public void save(T item){
         ensureOpen();
 
         this.database.beginTransaction();
@@ -214,10 +211,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void save(Collection<T> items) throws StoreNotOpenException {
+    public void save(Collection<T> items){
         ensureOpen();
 
         this.database.beginTransaction();
@@ -293,10 +289,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void reset() throws StoreNotOpenException {
+    public void reset(){
         ensureOpen();
 
         String sql = String.format("Delete from %s_property", className);
@@ -306,10 +301,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public boolean isEmpty() throws StoreNotOpenException {
+    public boolean isEmpty(){
         ensureOpen();
 
         String sql = String.format("Select count(_ID) from %s_property", className);
@@ -323,10 +317,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void remove(Serializable id) throws StoreNotOpenException {
+    public void remove(Serializable id){
         ensureOpen();
 
         String sql = String.format("Delete from %s_property where PARENT_ID = ?", className);
@@ -473,7 +466,8 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private void ensureOpen() {
         if (!isOpen()) {
-            throw new StoreNotOpenException();
+            Log.w(TAG, "Store is not opened, trying to open.");
+            openSync();
         }
     }
 
