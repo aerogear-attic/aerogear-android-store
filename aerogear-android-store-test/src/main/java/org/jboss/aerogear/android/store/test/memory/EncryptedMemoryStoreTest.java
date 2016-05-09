@@ -64,7 +64,7 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
 
         Store<Data> store1 = DataManager.config("store1", EncryptedMemoryStoreConfiguration.class)
                 .usingPassword("AeroGear")
-                .store();
+                .store(null);
 
         Data data = new Data(10, "name", "description");
         store1.save(data);
@@ -75,8 +75,7 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
     public void testCreateSQLStoreWithoutPassphrase() {
 
         Store<Data> store2 = DataManager.config("store2", EncryptedMemoryStoreConfiguration.class)
-                .forClass(Data.class)
-                .store();
+                .store(Data.class);
 
         Data data = new Data(10, "name", "description");
         store2.save(data);
@@ -86,7 +85,7 @@ public class EncryptedMemoryStoreTest extends PatchedActivityInstrumentationTest
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutPassphraseAndKlass() {
 
-        Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store();
+        Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store(null);
 
         Data data = new Data(10, "name", "description");
         store3.save(data);
