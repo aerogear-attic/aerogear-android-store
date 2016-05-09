@@ -27,15 +27,9 @@ import org.jboss.aerogear.android.store.StoreConfiguration;
 public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConfiguration>
         implements Config<SQLStoreConfiguration> {
 
-    private Class klass;
     private Context context;
     private GsonBuilder builder = new GsonBuilder();
     private IdGenerator idGenerator = new DefaultIdGenerator();
-
-    public SQLStoreConfiguration forClass(Class klass) {
-        this.klass = klass;
-        return this;
-    }
 
     public SQLStoreConfiguration withContext(Context context) {
         this.context = context;
@@ -53,12 +47,12 @@ public final class SQLStoreConfiguration extends StoreConfiguration<SQLStoreConf
     }
 
     @Override
-    protected Store buildStore() {
+    protected <TYPE> Store<TYPE> buildStore(Class<TYPE> klass) {
         if((klass == null) || (context == null)) {
             throw new IllegalStateException("Klass and Context are mandatory");
         }
 
-        return new SQLStore(klass, context, builder, idGenerator);
+        return new SQLStore<>(klass, context, builder, idGenerator);
     }
 
 }

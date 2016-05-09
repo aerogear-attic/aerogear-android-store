@@ -84,7 +84,6 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
     public Collection<T> readAll(){
