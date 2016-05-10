@@ -56,14 +56,14 @@ public abstract class StoreConfiguration<CONFIGURATION extends StoreConfiguratio
         return (CONFIGURATION) this;
     }
 
-    public final Store store() {
-        Store store = buildStore();
+    public final <TYPE> Store<TYPE> store(Class<TYPE> klass) {
+        Store<TYPE> store = buildStore(klass);
         for (OnStoreCreatedListener listener : getOnStoreCreatedListeners()) {
             listener.onStoreCreated(this, store);
         }
         return store;
     }
 
-    protected abstract Store buildStore();
+    protected abstract <TYPE> Store<TYPE> buildStore(Class<TYPE> klass);
 
 }

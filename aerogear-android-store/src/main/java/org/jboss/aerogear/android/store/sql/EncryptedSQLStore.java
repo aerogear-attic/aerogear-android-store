@@ -33,7 +33,6 @@ import org.jboss.aerogear.android.security.InvalidKeyException;
 import org.jboss.aerogear.android.security.SecurityManager;
 import org.jboss.aerogear.android.security.keystore.KeyStoreBasedEncryptionConfiguration;
 import org.jboss.aerogear.android.store.Store;
-import org.jboss.aerogear.android.store.StoreNotOpenException;
 import org.jboss.aerogear.android.store.generator.IdGenerator;
 import org.jboss.aerogear.android.store.util.CryptoEntityUtil;
 import org.jboss.aerogear.crypto.RandomUtils;
@@ -155,10 +154,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      * {@inheritDoc}
      *
      * @throws InvalidKeyException   Will occur if you use the wrong password to retrieve the data
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public Collection<T> readAll() throws InvalidKeyException, StoreNotOpenException {
+    public Collection<T> readAll() throws InvalidKeyException {
         ensureOpen();
 
         ArrayList<T> dataList = new ArrayList<T>();
@@ -182,10 +180,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      * {@inheritDoc}
      *
      * @throws InvalidKeyException   Will occur if you use the wrong password to retrieve the data
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public T read(Serializable id) throws InvalidKeyException, StoreNotOpenException {
+    public T read(Serializable id) throws InvalidKeyException {
         ensureOpen();
 
         String sql = "SELECT " + COLUMN_DATA + " FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
@@ -215,10 +212,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void save(T item) throws StoreNotOpenException {
+    public void save(T item)  {
         ensureOpen();
 
         this.database.beginTransaction();
@@ -233,10 +229,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void save(Collection<T> items) throws StoreNotOpenException {
+    public void save(Collection<T> items) {
         ensureOpen();
 
         this.database.beginTransaction();
@@ -270,10 +265,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void reset() throws StoreNotOpenException {
+    public void reset() {
         ensureOpen();
 
         String sql = String.format("DELETE FROM " + TABLE_NAME);
@@ -283,10 +277,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public void remove(Serializable id) throws StoreNotOpenException {
+    public void remove(Serializable id) {
         ensureOpen();
 
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = ?";
@@ -296,10 +289,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws StoreNotOpenException Will occur if this method is called before opening the database
      */
     @Override
-    public boolean isEmpty() throws StoreNotOpenException {
+    public boolean isEmpty() {
         ensureOpen();
 
         String sql = "SELECT COUNT(" + COLUMN_ID + ") FROM " + TABLE_NAME;
@@ -351,7 +343,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     private void ensureOpen() {
         if (!isOpen()) {
-            throw new StoreNotOpenException();
+            Log.w(TAG, "Store is not opened, trying to open.");
+            openSync();
         }
     }
 

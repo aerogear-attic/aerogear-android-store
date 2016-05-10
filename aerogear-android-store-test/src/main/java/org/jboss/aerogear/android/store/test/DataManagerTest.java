@@ -39,7 +39,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase {
     public void testCreateStore() {
         Store store = DataManager
                 .config("foo1", MemoryStoreConfiguration.class)
-                .store();
+                .store(Object.class);
 
         Assert.assertNotNull("store could not be null", store);
     }
@@ -48,7 +48,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase {
     public void testGetStore() {
         DataManager
                 .config("foo2", MemoryStoreConfiguration.class)
-                .store();
+                .store(Object.class);
 
         Store store = DataManager.getStore("foo2");
 
@@ -59,11 +59,11 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase {
     public void testCreateMoreThanOneStoreInDataManager() {
         DataManager
                 .config("foo4", MemoryStoreConfiguration.class)
-                .store();
+                .store(Object.class);
 
         DataManager
                 .config("foo5", MemoryStoreConfiguration.class)
-                .store();
+                .store(Object.class);
 
         Store store1 = DataManager.getStore("foo4");
         Store store2 = DataManager.getStore("foo5");
@@ -93,7 +93,7 @@ public class DataManagerTest extends PatchedActivityInstrumentationTestCase {
         }
 
         @Override
-        protected Store buildStore() {
+        protected Store buildStore(Class klass) {
             return null;
         }
     }

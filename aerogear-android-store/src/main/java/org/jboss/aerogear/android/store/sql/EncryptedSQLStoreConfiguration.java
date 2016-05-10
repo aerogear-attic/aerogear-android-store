@@ -27,16 +27,10 @@ import org.jboss.aerogear.android.store.StoreConfiguration;
 public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<EncryptedSQLStoreConfiguration>
         implements Config<EncryptedSQLStoreConfiguration> {
 
-    private Class klass;
     private Context context;
     private GsonBuilder builder = new GsonBuilder();
     private IdGenerator idGenerator = new DefaultIdGenerator();
     private String passphrase;
-
-    public EncryptedSQLStoreConfiguration forClass(Class klass) {
-        this.klass = klass;
-        return this;
-    }
 
     public EncryptedSQLStoreConfiguration withContext(Context context) {
         this.context = context;
@@ -59,12 +53,12 @@ public final class EncryptedSQLStoreConfiguration extends StoreConfiguration<Enc
     }
 
     @Override
-    protected Store buildStore() {
+    protected <TYPE> Store<TYPE> buildStore(Class<TYPE> klass) {
         if((klass == null) || (passphrase == null) || (context == null)) {
             throw new IllegalStateException("Klass, Passphrase and Context are mandatory");
         }
 
-        return new EncryptedSQLStore(klass, context, builder, idGenerator, passphrase);
+        return new EncryptedSQLStore<>(klass, context, builder, idGenerator, passphrase);
     }
 
 }

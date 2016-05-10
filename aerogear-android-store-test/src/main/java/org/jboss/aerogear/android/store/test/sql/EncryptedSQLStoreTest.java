@@ -21,8 +21,8 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.RenamingDelegatingContext;
 import com.google.gson.GsonBuilder;
 import org.jboss.aerogear.android.store.DataManager;
-import org.jboss.aerogear.android.store.StoreNotOpenException;
 import org.jboss.aerogear.android.store.generator.DefaultIdGenerator;
+import org.jboss.aerogear.android.store.Store;
 import org.jboss.aerogear.android.store.sql.EncryptedSQLStore;
 import org.jboss.aerogear.android.store.sql.EncryptedSQLStoreConfiguration;
 import org.jboss.aerogear.android.store.test.MainActivity;
@@ -48,30 +48,27 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     }
 
     private Context context;
-    private EncryptedSQLStore<Data> store;
+    private Store<Data> store;
 
     @Before
     public void setUp() throws Exception {
 
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
 
-        store = (EncryptedSQLStore<Data>) DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
+        store = DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
                 .usingPassphrase("AeroGear")
-                .forClass(Data.class)
-                .store();
+                .store(Data.class);
 
-        store.openSync();
     }
 
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutKlass() {
 
-        EncryptedSQLStore<Data> store1 = (EncryptedSQLStore<Data>) DataManager.config("store1", EncryptedSQLStoreConfiguration.class)
+        Store<Data> store1 = DataManager.config("store1", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
                 .usingPassphrase("AeroGear")
-                .store();
-        store1.openSync();
+                .store(null);
 
         Data data = new Data(10, "name", "description");
         store1.save(data);
@@ -81,11 +78,10 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutContext() {
 
-        EncryptedSQLStore<Data> store2 = (EncryptedSQLStore<Data>) DataManager.config("store2", EncryptedSQLStoreConfiguration.class)
-                .forClass(Data.class)
+        Store<Data> store2 = DataManager.config("store2", EncryptedSQLStoreConfiguration.class)
                 .usingPassphrase("AeroGear")
-                .store();
-        store2.openSync();
+                .store(Data.class);
+        
 
         Data data = new Data(10, "name", "description");
         store2.save(data);
@@ -95,12 +91,10 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutPassphrase() {
 
-        EncryptedSQLStore<Data> store3 = (EncryptedSQLStore<Data>) DataManager.config("store3", EncryptedSQLStoreConfiguration.class)
+        Store<Data> store3 = DataManager.config("store3", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
-                .forClass(String.class)
-                .store();
-        store3.openSync();
-
+                .store(Data.class);
+        
         Data data = new Data(10, "name", "description");
         store3.save(data);
 
@@ -108,8 +102,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
 
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutContextAndKlassAndPassphrase() {
-        EncryptedSQLStore<Data> store4 = (EncryptedSQLStore<Data>) DataManager.config("store3", EncryptedSQLStoreConfiguration.class).store();
-        store4.openSync();
+        Store<Data> store4 = DataManager.config("store3", EncryptedSQLStoreConfiguration.class).store(null);
 
         Data data = new Data(10, "name", "description");
         store4.save(data);
@@ -178,58 +171,6 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
         assertFalse("Store can not be empty", store.isEmpty());
     }
 
-    @Test(expected = StoreNotOpenException.class)
-    public void testReadAllWithClosedStore() {
-        EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        closedStore.readAll();
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testReadWithClosedStore() {
-
-        EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        closedStore.read(Long.valueOf("1"));
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testSaveWithClosedStore() {
-
-        EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        closedStore.save(new Data("AeroGear", "The best framework for mobile development."));
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testRemoveWithClosedStore() {
-
-        EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        closedStore.remove(Long.valueOf("1"));
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testResetWithClosedStore() {
-        EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        closedStore.reset();
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testIsEmptyWithClosedStore() {
-
-        EncryptedSQLStore<Data> closedStore = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        closedStore.isEmpty();
-
-    }
-
     @Test
     public void testSaveCollection() {
         List<Data> items = new ArrayList<Data>();
@@ -241,25 +182,9 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
 
         EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
                 Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        store.openSync();
+        
         store.save(items);
 
         Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
     }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testSaveCollectionWithClosedStore() {
-        List<Data> items = new ArrayList<Data>();
-        items.add(new Data(1, "Item 1", "This is the item 1"));
-        items.add(new Data(2, "Item 2", "This is the item 2"));
-        items.add(new Data(3, "Item 3", "This is the item 3"));
-        items.add(new Data(4, "Item 4", "This is the item 4"));
-        items.add(new Data(5, "Item 5", "This is the item 5"));
-
-        EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
-                Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        store.save(items);
-
-    }
-
 }

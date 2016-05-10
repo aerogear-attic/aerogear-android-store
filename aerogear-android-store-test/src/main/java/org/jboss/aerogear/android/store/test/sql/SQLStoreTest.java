@@ -24,7 +24,6 @@ import org.jboss.aerogear.android.store.DataManager;
 import org.jboss.aerogear.android.core.ReadFilter;
 import org.jboss.aerogear.android.core.RecordId;
 import org.jboss.aerogear.android.store.Store;
-import org.jboss.aerogear.android.store.StoreNotOpenException;
 import org.jboss.aerogear.android.store.sql.SQLStore;
 import org.jboss.aerogear.android.store.test.helper.Data;
 import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
@@ -64,21 +63,18 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
 
         this.store = (SQLStore) DataManager
                 .config("store", SQLStoreConfiguration.class)
-                .forClass(Data.class)
                 .withContext(context)
-                .store();
+                .store(Data.class);
 
         this.nestedStore = (SQLStore) DataManager
                 .config("trivialNestedClass", SQLStoreConfiguration.class)
-                .forClass(TrivialNestedClass.class)
                 .withContext(context)
-                .store();
+                .store(TrivialNestedClass.class);
 
         this.nestedWithCollectionStore = (SQLStore) DataManager
                 .config("trivialNestedClassWithCollection", SQLStoreConfiguration.class)
-                .forClass(TrivialNestedClassWithCollection.class)
                 .withContext(context)
-                .store();
+                .store(TrivialNestedClassWithCollection.class);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -86,7 +82,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
 
         Store<Data> store1 = DataManager.config("store1", SQLStoreConfiguration.class)
                 .withContext(context)
-                .store();
+                .store(null);
 
         Data data = new Data(10, "name", "description");
         store1.save(data);
@@ -97,8 +93,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
     public void testCreateSQLStoreWithoutContext() {
 
         Store<Data> store2 = DataManager.config("store2", SQLStoreConfiguration.class)
-                .forClass(Data.class)
-                .store();
+                .store(Data.class);
 
         Data data = new Data(10, "name", "description");
         store2.save(data);
@@ -108,7 +103,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutContextAndKlass() {
 
-        Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store();
+        Store<Data> store3 = DataManager.config("store3", SQLStoreConfiguration.class).store(null);
 
         Data data = new Data(10, "name", "description");
         store3.save(data);
@@ -303,7 +298,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
     @Test
     public void testSuccessCallback() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(2);
-        store.open(new Callback<SQLStore<Data>>() {
+        ((SQLStore)store).open(new Callback<SQLStore<Data>>() {
             @Override
             public void onSuccess(SQLStore<Data> data) {
                 latch.countDown();
@@ -320,7 +315,6 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
     }
 
     private void saveData(Integer id, String name, String desc) throws InterruptedException {
-        store.openSync();
         store.save(new Data(id, name, desc));
     }
 
@@ -345,58 +339,6 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
 
     }
 
-    @Test(expected = StoreNotOpenException.class)
-    public void testReadAllWithClosedStore() {
-
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.readAll();
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testReadWithClosedStore() {
-
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.read(Long.valueOf("1"));
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testReadWithFilterWithClosedStore() {
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.readWithFilter(new ReadFilter());
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testSaveWithClosedStore() {
-
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.save(new Data("AeroGear", "The best framework for mobile development."));
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testRemoveWithClosedStore() {
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.remove(Long.valueOf("1"));
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testResetWithClosedStore() {
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.reset();
-
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testIsEmptyWithClosedStore() {
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.isEmpty();
-
-    }
-
     @Test
     public void testSaveCollection() {
         List<Data> items = new ArrayList<Data>();
@@ -411,20 +353,6 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
         store.save(items);
 
         Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
-    }
-
-    @Test(expected = StoreNotOpenException.class)
-    public void testSaveCollectionWithClosedStore() {
-        List<Data> items = new ArrayList<Data>();
-        items.add(new Data(1, "Item 1", "This is the item 1"));
-        items.add(new Data(2, "Item 2", "This is the item 2"));
-        items.add(new Data(3, "Item 3", "This is the item 3"));
-        items.add(new Data(4, "Item 4", "This is the item 4"));
-        items.add(new Data(5, "Item 5", "This is the item 5"));
-
-        SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
-        store.save(items);
-
     }
 
     private void loadBulkData() throws InterruptedException {

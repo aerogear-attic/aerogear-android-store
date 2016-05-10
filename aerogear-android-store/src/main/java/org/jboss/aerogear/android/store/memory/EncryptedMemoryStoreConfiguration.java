@@ -29,7 +29,6 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
     private Context context;
     private IdGenerator idGenerator = new DefaultIdGenerator();
     private String password;
-    private Class klass;
 
     public EncryptedMemoryStoreConfiguration withContext(Context context) {
         this.context = context;
@@ -46,19 +45,14 @@ public final class EncryptedMemoryStoreConfiguration extends StoreConfiguration<
         return this;
     }
 
-    public EncryptedMemoryStoreConfiguration forClass(Class klass) {
-        this.klass = klass;
-        return this;
-    }
-
 
     @Override
-    protected Store buildStore() {
+    protected <TYPE> Store<TYPE> buildStore(Class<TYPE> klass) {
         if ((context == null) || (klass == null) || (password == null)) {
             throw new IllegalStateException("Context, Klass and Passphrase are mandatory");
         }
 
-        return new EncryptedMemoryStore(context, idGenerator, password, klass);
+        return new EncryptedMemoryStore<>(context, idGenerator, password, klass);
     }
 
 }
