@@ -17,6 +17,7 @@
 package org.jboss.aerogear.android.store.test.sql;
 
 import android.content.Context;
+import android.os.StrictMode;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.RenamingDelegatingContext;
 import org.jboss.aerogear.android.core.Callback;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -56,8 +58,22 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
     private SQLStore<TrivialNestedClass> nestedStore;
     private SQLStore<TrivialNestedClassWithCollection> nestedWithCollectionStore;
 
+    private static final StrictMode.VmPolicy DEFAULT_VM_POLICY = StrictMode.getVmPolicy();
+    
+    
+    private static final StrictMode.VmPolicy STRICT_VM_POLICY = new StrictMode.VmPolicy.Builder()
+                .detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .penaltyDeath()
+                .build();
+    
+
     @Before
     public void setUp() throws Exception {
+
+        StrictMode.setVmPolicy(STRICT_VM_POLICY);
+        
         Assume.assumeTrue(!System.getProperty("os.name").toLowerCase().startsWith("mac os x") || !System.getProperty("java.version").startsWith("1.7.0"));
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
 
@@ -77,6 +93,15 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
                 .store(TrivialNestedClassWithCollection.class);
     }
 
+    @After
+    public void closeAll() {
+        this.store.close();
+        this.nestedStore.close();
+        this.nestedWithCollectionStore.close();
+
+        StrictMode.setVmPolicy(DEFAULT_VM_POLICY);
+    }
+    
     @Test(expected = IllegalStateException.class)
     public void testCreateSQLStoreWithoutKlass() {
 
@@ -298,7 +323,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
     @Test
     public void testSuccessCallback() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(2);
-        ((SQLStore)store).open(new Callback<SQLStore<Data>>() {
+        ((SQLStore) store).open(new Callback<SQLStore<Data>>() {
             @Override
             public void onSuccess(SQLStore<Data> data) {
                 latch.countDown();
@@ -336,6 +361,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
         }
         longStore.save(longList);
         Assert.assertEquals(100, longStore.readAll().iterator().next().data.size());
+        longStore.close();
 
     }
 
@@ -351,8 +377,8 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
         SQLStore<Data> store = new SQLStore<Data>(Data.class, context);
         store.openSync();
         store.save(items);
-
         Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
+        store.close();
     }
 
     private void loadBulkData() throws InterruptedException {

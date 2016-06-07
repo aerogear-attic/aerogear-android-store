@@ -86,7 +86,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public Collection<T> readAll(){
+    public Collection<T> readAll() {
         ensureOpen();
 
         String sql = String.format("Select PROPERTY_NAME, PROPERTY_VALUE,PARENT_ID from %s_property", className);
@@ -102,15 +102,16 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
                 }
                 add(object, cursor.getString(0), cursor.getString(1));
             }
+            ArrayList<T> data = new ArrayList<T>(cursor.getCount());
+            for (JsonObject object : objects.values()) {
+                data.add(gson.fromJson(object, klass));
+            }
+
+            return data;
+
         } finally {
             cursor.close();
         }
-        ArrayList<T> data = new ArrayList<T>(cursor.getCount());
-        for (JsonObject object : objects.values()) {
-            data.add(gson.fromJson(object, klass));
-        }
-
-        return data;
 
     }
 
@@ -128,11 +129,11 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
         JsonObject result = new JsonObject();
         Cursor cursor = database.rawQuery(sql, bindArgs);
 
-        if (cursor.getCount() == 0) {
-            return null;
-        }
-
         try {
+            if (cursor.getCount() == 0) {
+                return null;
+            }
+
             while (cursor.moveToNext()) {
                 add(result, cursor.getString(0), cursor.getString(1));
             }
@@ -149,7 +150,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public List<T> readWithFilter(ReadFilter filter){
+    public List<T> readWithFilter(ReadFilter filter) {
         ensureOpen();
 
         if (filter == null) {
@@ -195,7 +196,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public void save(T item){
+    public void save(T item) {
         ensureOpen();
 
         this.database.beginTransaction();
@@ -212,7 +213,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public void save(Collection<T> items){
+    public void save(Collection<T> items) {
         ensureOpen();
 
         this.database.beginTransaction();
@@ -290,7 +291,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public void reset(){
+    public void reset() {
         ensureOpen();
 
         String sql = String.format("Delete from %s_property", className);
@@ -302,7 +303,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         ensureOpen();
 
         String sql = String.format("Select count(_ID) from %s_property", className);
@@ -318,7 +319,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public void remove(Serializable id){
+    public void remove(Serializable id) {
         ensureOpen();
 
         String sql = String.format("Delete from %s_property where PARENT_ID = ?", className);
@@ -375,7 +376,9 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     @Override
     public void close() {
-        this.database.close();
+        if (this.database != null && this.database.isOpen()) {
+            this.database.close();
+        }
     }
 
     private void add(JsonObject result, String propertyName, String propertyValue) {
@@ -435,26 +438,23 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             JsonElement jsonValue = entry.getValue();
             if (jsonValue.isJsonObject()) {
                 buildKeyValuePairs((JsonObject) jsonValue, keyValues, path);
-            } else {
-                if (jsonValue.isJsonPrimitive()) {
-                    JsonPrimitive primitive = jsonValue.getAsJsonPrimitive();
-                    if (primitive.isBoolean()) {
-                        String value = primitive.getAsBoolean() ? "true" : "false";
-                        keyValues.add(new Pair<String, String>(path, value));
-                    } else if (primitive.isNumber()) {
-                        Number value = primitive.getAsNumber();
-                        keyValues.add(new Pair<String, String>(path, value.toString()));
-                    } else if (primitive.isString()) {
-                        String value = primitive.getAsString();
-                        keyValues.add(new Pair<String, String>(path, value));
-                    } else {
-                        throw new IllegalArgumentException(jsonValue + " isn't a number, boolean, or string");
-                    }
-
+            } else if (jsonValue.isJsonPrimitive()) {
+                JsonPrimitive primitive = jsonValue.getAsJsonPrimitive();
+                if (primitive.isBoolean()) {
+                    String value = primitive.getAsBoolean() ? "true" : "false";
+                    keyValues.add(new Pair<String, String>(path, value));
+                } else if (primitive.isNumber()) {
+                    Number value = primitive.getAsNumber();
+                    keyValues.add(new Pair<String, String>(path, value.toString()));
+                } else if (primitive.isString()) {
+                    String value = primitive.getAsString();
+                    keyValues.add(new Pair<String, String>(path, value));
                 } else {
-                    throw new IllegalArgumentException(jsonValue + " isn't a JsonPrimitive");
+                    throw new IllegalArgumentException(jsonValue + " isn't a number, boolean, or string");
                 }
 
+            } else {
+                throw new IllegalArgumentException(jsonValue + " isn't a JsonPrimitive");
             }
         }
     }
