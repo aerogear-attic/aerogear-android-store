@@ -17,6 +17,7 @@
 package org.jboss.aerogear.android.store.test.sql;
 
 import android.content.Context;
+import android.os.StrictMode;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.RenamingDelegatingContext;
 import com.google.gson.GsonBuilder;
@@ -36,6 +37,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.junit.After;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,23 +45,40 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCase {
 
+    private static final StrictMode.VmPolicy DEFAULT_VM_POLICY = StrictMode.getVmPolicy();
+
+    private static final StrictMode.VmPolicy STRICT_VM_POLICY = new StrictMode.VmPolicy.Builder()
+            .detectLeakedSqlLiteObjects()
+            .detectLeakedClosableObjects()
+            .penaltyLog()
+            .penaltyDeath()
+            .build();
+
     public EncryptedSQLStoreTest() {
         super(MainActivity.class);
     }
 
     private Context context;
-    private Store<Data> store;
+    private EncryptedSQLStore<Data> store;
 
     @Before
     public void setUp() throws Exception {
 
+        StrictMode.setVmPolicy(STRICT_VM_POLICY);
+
         this.context = new RenamingDelegatingContext(getActivity(), UUID.randomUUID().toString());
 
-        store = DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
+        store = (EncryptedSQLStore<Data>) DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
                 .usingPassphrase("AeroGear")
                 .store(Data.class);
 
+    }
+
+    @After
+    public void closeAll() {
+        this.store.close();
+        StrictMode.setVmPolicy(DEFAULT_VM_POLICY);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -81,7 +100,6 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
         Store<Data> store2 = DataManager.config("store2", EncryptedSQLStoreConfiguration.class)
                 .usingPassphrase("AeroGear")
                 .store(Data.class);
-        
 
         Data data = new Data(10, "name", "description");
         store2.save(data);
@@ -94,7 +112,7 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
         Store<Data> store3 = DataManager.config("store3", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
                 .store(Data.class);
-        
+
         Data data = new Data(10, "name", "description");
         store3.save(data);
 
@@ -182,9 +200,10 @@ public class EncryptedSQLStoreTest extends PatchedActivityInstrumentationTestCas
 
         EncryptedSQLStore<Data> store = new EncryptedSQLStore<Data>(
                 Data.class, context, new GsonBuilder(), new DefaultIdGenerator(), "AeroGear");
-        
+
         store.save(items);
 
         Assert.assertEquals("Should have " + items.size() + " items", items.size(), store.readAll().size());
+        store.close();
     }
 }

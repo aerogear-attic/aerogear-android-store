@@ -61,12 +61,12 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     private CryptoEntityUtil<T> cryptoEntityUtil;
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-                             IdGenerator idGenerator, String password) {
+            IdGenerator idGenerator, String password) {
         this(modelClass, context, builder, idGenerator, password, modelClass.getSimpleName());
     }
 
     public EncryptedSQLStore(Class<T> modelClass, Context context, GsonBuilder builder,
-                             IdGenerator idGenerator, String password, String tableName) {
+            IdGenerator idGenerator, String password, String tableName) {
 
         super(context, modelClass.getSimpleName(), null, 2);
 
@@ -87,31 +87,28 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         // -- Table for helper data
-
-        String SQL_CREATE_ENCRYPT_HELPER_TABLE = "CREATE TABLE IF NOT EXISTS " + getEncryptTableHelperName() +
-                " ( " +
-                COLUMN_ID + " TEXT NOT NULL, " +
-                COLUMN_DATA + " BLOB NOT NULL " +
-                " ) ";
+        String SQL_CREATE_ENCRYPT_HELPER_TABLE = "CREATE TABLE IF NOT EXISTS " + getEncryptTableHelperName()
+                + " ( "
+                + COLUMN_ID + " TEXT NOT NULL, "
+                + COLUMN_DATA + " BLOB NOT NULL "
+                + " ) ";
         sqLiteDatabase.execSQL(SQL_CREATE_ENCRYPT_HELPER_TABLE);
 
         // -- Store iv
-
         byte[] iv = RandomUtils.randomBytes();
 
-        String SQL_STORE_DATA = "INSERT INTO " + getEncryptTableHelperName() +
-                " ( " + COLUMN_ID + ", " + COLUMN_DATA + " ) " +
-                " VALUES ( ?, ? ) ";
+        String SQL_STORE_DATA = "INSERT INTO " + getEncryptTableHelperName()
+                + " ( " + COLUMN_ID + ", " + COLUMN_DATA + " ) "
+                + " VALUES ( ?, ? ) ";
 
         sqLiteDatabase.execSQL(SQL_STORE_DATA, new Object[]{ID_IV, iv});
 
         // -- Table for encrypted data
-
-        String SQL_CREATE_ENTITY_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
-                " ( " +
-                COLUMN_ID + " TEXT NOT NULL, " +
-                COLUMN_DATA + " BLOB NOT NULL " +
-                " ) ";
+        String SQL_CREATE_ENTITY_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME
+                + " ( "
+                + COLUMN_ID + " TEXT NOT NULL, "
+                + COLUMN_DATA + " BLOB NOT NULL "
+                + " ) ";
         sqLiteDatabase.execSQL(SQL_CREATE_ENTITY_TABLE);
 
     }
@@ -153,7 +150,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws InvalidKeyException   Will occur if you use the wrong password to retrieve the data
+     * @throws InvalidKeyException Will occur if you use the wrong password to
+     * retrieve the data
      */
     @Override
     public Collection<T> readAll() throws InvalidKeyException {
@@ -179,7 +177,8 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
     /**
      * {@inheritDoc}
      *
-     * @throws InvalidKeyException   Will occur if you use the wrong password to retrieve the data
+     * @throws InvalidKeyException Will occur if you use the wrong password to
+     * retrieve the data
      */
     @Override
     public T read(Serializable id) throws InvalidKeyException {
@@ -214,7 +213,7 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
      *
      */
     @Override
-    public void save(T item)  {
+    public void save(T item) {
         ensureOpen();
 
         this.database.beginTransaction();
@@ -334,7 +333,9 @@ public class EncryptedSQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
     @Override
     public void close() {
-        this.database.close();
+        if (database != null && database.isOpen()) {
+            this.database.close();
+        }
     }
 
     private boolean isOpen() {
