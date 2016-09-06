@@ -34,8 +34,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -381,6 +384,26 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
         store.close();
     }
 
+    @Test
+    public void testSaveItemWithMap() {
+        TrivialNestedMap trivialNestedMap = new TrivialNestedMap();
+        trivialNestedMap.setId(1);
+        Map<String, String> data = new HashMap<>();
+        trivialNestedMap.setData(data);
+
+        String key = "dot.breaks";
+        data.put(key, "value");
+        SQLStore<TrivialNestedMap> store = new SQLStore<>(TrivialNestedMap.class, context);
+        store.openSync();
+        store.save(trivialNestedMap);
+
+        Collection<TrivialNestedMap> result = store.readAll();
+
+        Assert.assertTrue(!result.isEmpty());
+        Assert.assertTrue(result.iterator().next().getData().containsKey(key));
+        store.close();
+    }
+
     private void loadBulkData() throws InterruptedException {
         saveData(1, "name", "description");
         saveData(2, "name", "description");
@@ -388,6 +411,28 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
         saveData(4, "name2", "description");
         saveData(5, "name", "description2");
         saveData(6, "name2", "description2");
+    }
+
+    public static final class TrivialNestedMap {
+        @RecordId
+        private Integer id;
+        private Map<String, String> data;
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public Map<String, String> getData() {
+            return data;
+        }
+
+        public void setData(Map<String, String> data) {
+            this.data = data;
+        }
     }
 
     public static final class TrivialNestedClass {
