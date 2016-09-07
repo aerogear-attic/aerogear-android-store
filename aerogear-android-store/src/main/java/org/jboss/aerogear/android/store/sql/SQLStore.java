@@ -419,13 +419,26 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             } else {
 
                 JsonObject subObject = (JsonObject) result.get(names[0]);
-                if (subObject == null) {
-                    subObject = new JsonObject();
-                    result.add(names[0], subObject);
-                }
+                if (hasField(names[0])) {
+                    if (subObject == null) {
+                        subObject = new JsonObject();
+                        result.add(names[0], subObject);
+                    }
 
-                add(subObject, names[1], propertyValue);
+                    add(subObject, names[1], propertyValue);
+                } else {
+                    result.addProperty(String.join(".", names), propertyValue);
+                }
             }
+        }
+    }
+
+    private boolean hasField(String name) {
+        try {
+            klass.getDeclaredField(name);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
         }
     }
 
