@@ -20,14 +20,11 @@ import android.content.Context;
 import android.os.StrictMode;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.RenamingDelegatingContext;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import org.jboss.aerogear.android.core.Callback;
 import org.jboss.aerogear.android.store.DataManager;
 import org.jboss.aerogear.android.core.ReadFilter;
 import org.jboss.aerogear.android.core.RecordId;
 import org.jboss.aerogear.android.store.Store;
-import org.jboss.aerogear.android.store.generator.DefaultIdGenerator;
 import org.jboss.aerogear.android.store.sql.SQLStore;
 import org.jboss.aerogear.android.store.test.helper.Data;
 import org.jboss.aerogear.android.store.test.util.PatchedActivityInstrumentationTestCase;
@@ -36,12 +33,10 @@ import org.jboss.aerogear.android.store.test.MainActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -398,10 +393,7 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
 
         String key = "dot.breaks";
         data.put(key, "value");
-        Type type = new TypeToken<Map<String, String>>() {}.getType();
-        GsonBuilder gsonBuilder = new GsonBuilder()
-                .registerTypeAdapter(type, MapAsArrayTypeAdapter.get(String.class, String.class));
-        SQLStore<TrivialNestedMap> store = new SQLStore<>(TrivialNestedMap.class, context, gsonBuilder, new DefaultIdGenerator());
+        SQLStore<TrivialNestedMap> store = new SQLStore<>(TrivialNestedMap.class, context);
         store.openSync();
         store.save(trivialNestedMap);
 
@@ -529,45 +521,4 @@ public class SQLStoreTest extends PatchedActivityInstrumentationTestCase {
         }
 
     }
-
-    public static final class MapAsArrayTypeAdapter<K, V>
-            implements JsonSerializer<Map<K, V>>, JsonDeserializer<Map<K, V>> {
-        private final TypeToken<K> keyType;
-        private final TypeToken<V> valueType;
-
-        private MapAsArrayTypeAdapter(TypeToken<K> keyType, TypeToken<V> valueType) {
-            this.keyType = keyType;
-            this.valueType = valueType;
-        }
-
-        public static <K, V> MapAsArrayTypeAdapter<K, V> get(Class<K> keyType, Class<V> valueType) {
-            return new MapAsArrayTypeAdapter<K, V>(TypeToken.get(keyType), TypeToken.get(valueType));
-        }
-
-        public static <K, V> MapAsArrayTypeAdapter<K, V> get(
-                TypeToken<K> keyType, TypeToken<V> valueType) {
-            return new MapAsArrayTypeAdapter<K, V>(keyType, valueType);
-        }
-
-        public Map<K, V> deserialize(JsonElement json, Type typeOfT,
-                                     JsonDeserializationContext context) throws JsonParseException {
-            Map<K, V> result = new LinkedHashMap<K, V>();
-            JsonArray array = json.getAsJsonArray();
-            for (int i = 0; i < array.size(); i+=2) {
-                result.put(context.<K>deserialize(array.get(i), keyType.getType()),
-                        context.<V>deserialize(array.get(i + 1), valueType.getType()));
-            }
-            return result;
-        }
-
-        public JsonElement serialize(Map<K, V> src, Type typeOfSrc, JsonSerializationContext context) {
-            JsonArray result = new JsonArray();
-            for (Map.Entry<K, V> entry : src.entrySet()) {
-                result.add(context.serialize(entry.getKey(), keyType.getType()));
-                result.add(context.serialize(entry.getValue(), valueType.getType()));
-            }
-            return result;
-        }
-    }
-
 }
