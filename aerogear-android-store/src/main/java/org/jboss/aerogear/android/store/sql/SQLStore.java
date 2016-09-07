@@ -23,6 +23,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
+import com.google.common.base.Joiner;
 import com.google.gson.*;
 import org.jboss.aerogear.android.core.Callback;
 import org.jboss.aerogear.android.core.ReadFilter;
@@ -427,7 +428,7 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
 
                     add(subObject, names[1], propertyValue);
                 } else {
-                    result.addProperty(String.join(".", names), propertyValue);
+                    result.addProperty(Joiner.on(".").join(names), propertyValue);
                 }
             }
         }
