@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import com.google.gson.*;
@@ -419,13 +420,26 @@ public class SQLStore<T> extends SQLiteOpenHelper implements Store<T> {
             } else {
 
                 JsonObject subObject = (JsonObject) result.get(names[0]);
-                if (subObject == null) {
-                    subObject = new JsonObject();
-                    result.add(names[0], subObject);
-                }
+                if (hasField(names[0])) {
+                    if (subObject == null) {
+                        subObject = new JsonObject();
+                        result.add(names[0], subObject);
+                    }
 
-                add(subObject, names[1], propertyValue);
+                    add(subObject, names[1], propertyValue);
+                } else {
+                    result.addProperty(TextUtils.join(".", names), propertyValue);
+                }
             }
+        }
+    }
+
+    private boolean hasField(String name) {
+        try {
+            klass.getDeclaredField(name);
+            return true;
+        } catch (NoSuchFieldException e) {
+            return false;
         }
     }
 
