@@ -22,14 +22,14 @@ android:
 
 env:
   matrix:
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-16" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-16"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-17" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-17"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-18" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-18"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-19" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-19"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-21" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-21"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-22" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-22"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-23" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-23"
-    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-24" ANDROID_ABI="armeabi-v7a" ANDROID_PKGS="sys-img-armeabi-v7a-android-24"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-16" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-16"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-17" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-17"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-18" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-18"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-19" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-19"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-21" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-21"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-22" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-22"
+    # ANDROID_SDK="android-24" ANDROID_EMULATOR="android-23" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-23"
+    - ANDROID_SDK="android-24" ANDROID_EMULATOR="android-24" ANDROID_ABI="armeabi-v7a"  ANDROID_PKGS="sys-img-armeabi-v7a-android-24"
 
 before_install:
 
