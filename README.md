@@ -75,6 +75,7 @@ Take a look in our demo apps
 
 * [CarStore](https://github.com/aerogear/aerogear-android-cookbook/blob/master/CarStore)
 * [AeroDoc](https://github.com/aerogear/aerogear-android-cookbook/blob/master/AeroDoc)
+* [PasswordManager](https://github.com/aerogear/aerogear-android-cookbook/tree/master/PasswordManager)
 
 ## Development
 
