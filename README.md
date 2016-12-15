@@ -38,7 +38,7 @@ There are two supported ways of developing apps using AeroGear for Android: Andr
 
 Add to your application's `build.gradle` file
 
-```
+```groovy
 dependencies {
   compile 'org.jboss.aerogear:aerogear-android-store:3.1.0'
 }
@@ -48,7 +48,7 @@ dependencies {
 
 Include the following dependencies in your project's `pom.xml`
 
-```
+```xml
 <dependency>
   <groupId>org.jboss.aerogear</groupId>
   <artifactId>aerogear-android-store</artifactId>
