@@ -40,7 +40,7 @@ Add to your application's `build.gradle` file
 
 ```
 dependencies {
-  compile 'org.jboss.aerogear:aerogear-android-store:2.1.0'
+  compile 'org.jboss.aerogear:aerogear-android-store:3.1.0'
 }
 ```
 
@@ -52,7 +52,7 @@ Include the following dependencies in your project's `pom.xml`
 <dependency>
   <groupId>org.jboss.aerogear</groupId>
   <artifactId>aerogear-android-store</artifactId>
-  <version>2.1.0</version>
+  <version>3.1.0</version>
   <scope>provided</scope>
   <type>jar</type>
 </dependency>
@@ -60,7 +60,7 @@ Include the following dependencies in your project's `pom.xml`
 <dependency>
   <groupId>org.jboss.aerogear</groupId>
   <artifactId>aerogear-android-store</artifactId>
-  <version>2.1.0</version>
+  <version>3.1.0</version>
   <type>aar</type>
 </dependency>
 ```
