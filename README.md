@@ -1,6 +1,5 @@
 # AeroGear Android Store
 
-[![Travis](https://img.shields.io/travis/aerogear/aerogear-android-store.svg)](http://travis-ci.org/aerogear/aerogear-android-store)
 [![circle-ci](https://img.shields.io/circleci/project/github/aerogear/aerogear-android-store/master.svg)](https://circleci.com/gh/aerogear/aerogear-android-store)
 [![License](https://img.shields.io/badge/-Apache%202.0-blue.svg)](https://opensource.org/s/Apache-2.0)
 [![Maven Central](https://img.shields.io/maven-central/v/org.jboss.aerogear/aerogear-android-store.svg)](http://search.maven.org/#search%7Cga%7C1%7Caerogear-android-store)
