@@ -18,6 +18,7 @@ package org.jboss.aerogear.android.store.memory;
 
 import android.content.Context;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.RenamingDelegatingContext;
 
 import org.jboss.aerogear.android.core.ReadFilter;
 import org.jboss.aerogear.android.store.DataManager;
@@ -33,6 +34,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static android.support.test.InstrumentationRegistry.getContext;
 
@@ -41,9 +43,11 @@ public class EncryptedMemoryStoreTest {
 
     private Store<Data> store;
 
+    @SuppressWarnings("deprecation")
     @Before
     public void setUp() throws Exception {
-        Context context = getContext();
+        Context context = new RenamingDelegatingContext(getContext(), UUID.randomUUID().toString());
+
 
         StubIdGenerator stubIdGenerator = new StubIdGenerator();
         String passphrase = "Lorem Ipsum";

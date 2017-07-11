@@ -19,6 +19,7 @@ package org.jboss.aerogear.android.store.sql;
 import android.content.Context;
 import android.os.StrictMode;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.RenamingDelegatingContext;
 
 import org.jboss.aerogear.android.core.Callback;
 import org.jboss.aerogear.android.core.ReadFilter;
@@ -41,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -65,13 +67,14 @@ public class SQLStoreTest {
             .build();
 
 
+    @SuppressWarnings("deprecation")
     @Before
     public void setUp() throws Exception {
-
+        this.context = new RenamingDelegatingContext(getContext(), UUID.randomUUID().toString());
         StrictMode.setVmPolicy(STRICT_VM_POLICY);
 
         Assume.assumeTrue(!System.getProperty("os.name").toLowerCase().startsWith("mac os x") || !System.getProperty("java.version").startsWith("1.7.0"));
-        this.context = getContext();
+
 
         this.store = (SQLStore) DataManager
                 .config("store", SQLStoreConfiguration.class)

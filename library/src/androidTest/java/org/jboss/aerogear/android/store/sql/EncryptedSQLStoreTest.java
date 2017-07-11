@@ -18,7 +18,9 @@ package org.jboss.aerogear.android.store.sql;
 
 import android.content.Context;
 import android.os.StrictMode;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.test.RenamingDelegatingContext;
 
 import com.google.gson.GsonBuilder;
 
@@ -34,15 +36,21 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import static android.support.test.InstrumentationRegistry.getContext;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class EncryptedSQLStoreTest {
 
+
+    private Context context;
+    private EncryptedSQLStore<Data> store;
+
     private static final StrictMode.VmPolicy DEFAULT_VM_POLICY = StrictMode.getVmPolicy();
+
 
     private static final StrictMode.VmPolicy STRICT_VM_POLICY = new StrictMode.VmPolicy.Builder()
             .detectLeakedSqlLiteObjects()
@@ -51,16 +59,14 @@ public class EncryptedSQLStoreTest {
             .penaltyDeath()
             .build();
 
-    private Context context;
-    private EncryptedSQLStore<Data> store;
 
+    @SuppressWarnings("deprecation")
     @Before
     public void setUp() throws Exception {
 
         StrictMode.setVmPolicy(STRICT_VM_POLICY);
-
-        this.context = getContext();
-
+        this.context = new RenamingDelegatingContext(InstrumentationRegistry.getContext(),
+                                                     UUID.randomUUID().toString());
         store = (EncryptedSQLStore<Data>) DataManager.config("myTestStore", EncryptedSQLStoreConfiguration.class)
                 .withContext(context)
                 .usingPassphrase("AeroGear")
